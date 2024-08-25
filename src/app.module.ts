@@ -8,10 +8,11 @@ import { UserController } from './features/users/api/users.controller';
 import { UserService } from './features/users/application/user.service';
 import { BcryptService } from './infrastructure/utils/bcrypt';
 import { UserRepository } from './features/users/repository/user.repository';
+import { SETTINGS } from './settings/app-settings';
 
 @Module({
   imports: [
-    MongooseModule.forRoot('mongodb+srv://capricorn:Aid231289@cluster0.csgswii.mongodb.net/BloggersPlatform?retryWrites=true&w=majority&appName=Cluster0'),
+    MongooseModule.forRoot(SETTINGS.MONGO_URL),
     MongooseModule.forFeature([{name: User.name, schema: UserSchema}]),
   ],
   controllers: [AppController, UserController],
