@@ -16,3 +16,9 @@ export type LikesCount = {
     likesCount: number,
     dislikesCount: number,
 }
+
+export type NewestLikesType = {
+    addedAt: string,
+    userId: string;
+    login: string
+}

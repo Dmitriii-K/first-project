@@ -14,15 +14,34 @@ import { CommentQueryRepository } from './features/comments/repository/comment.q
 import { CommentRepository } from './features/comments/repository/comment.repository';
 import { CommentService } from './features/comments/application/comment.service';
 import { CommentSchema } from './features/comments/domain/comment.entity';
+import { Blog, BlogSchema } from './features/blogs/domain/blog.entity';
+import { BlogService } from './features/blogs/application/blog.service';
+import { BlogQueryRepository } from './features/blogs/repository/blog.query-repository';
+import { BlogRepository } from './features/blogs/repository/blog.repository';
+import { Post, PostSchema } from './features/posts/domain/post.entity';
+import { PostService } from './features/posts/application/post.service';
+import { PostRepository } from './features/posts/repository/post.repository';
+import { PostQueryRepository } from './features/posts/repository/post.query-repository';
+import { BlogController } from './features/blogs/api/blog.controller';
+import { PostController } from './features/posts/api/post.controller';
 
 @Module({
   imports: [
     MongooseModule.forRoot(SETTINGS.MONGO_URL),
     MongooseModule.forFeature([
-      {name: User.name, schema: UserSchema},
-      { name: Comment.name, schema: CommentSchema }]),
+      { name: User.name, schema: UserSchema },
+      { name: Comment.name, schema: CommentSchema },
+      { name: Blog.name, schema: BlogSchema },
+      { name: Post.name, schema: PostSchema }
+    ]),
   ],
-  controllers: [AppController, UserController, CommentController],
-  providers: [AppService, UserService, UserQueryRepository, UserRepository, BcryptService, CommentService, CommentQueryRepository, CommentRepository],
+  controllers: [AppController, UserController, CommentController, BlogController, PostController],
+  providers: [
+    AppService,
+    UserService, UserQueryRepository, UserRepository,
+    BcryptService,
+    CommentService, CommentQueryRepository, CommentRepository,
+    BlogService, BlogRepository, BlogQueryRepository,
+    PostService, PostRepository, PostQueryRepository],
 })
 export class AppModule {}
