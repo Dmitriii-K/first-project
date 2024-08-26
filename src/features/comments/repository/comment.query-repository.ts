@@ -4,12 +4,13 @@ import { InjectModel } from "@nestjs/mongoose";
 import { CommentDBType } from "src/base/types/comment.types";
 import { likeStatus } from "src/base/types/like.types";
 import { CommentViewModel } from "../api/models/output.model";
-import { CommentModelType } from "../domain/comment.entity";
+import { CommentDocument, CommentModelType } from "../domain/comment.entity";
+import { CommentRepository } from "./comment.repository";
 
 @Injectable()
-export class CommentQueryRepository implements ICommentQueryRepository{
+export class CommentQueryRepository /*implements ICommentQueryRepository*/{
     constructor(
-        /*protected commentRepository: ICommentRepository,*/
+        protected commentRepository: CommentRepository,
         @InjectModel(Comment.name) private commentModel: CommentModelType
     ) {}
 
@@ -25,9 +26,9 @@ export class CommentQueryRepository implements ICommentQueryRepository{
         // const userLikeStatus = like ? like.status : likeStatus.None;
         return this.mapComment(comment/*, userLikeStatus*/);
     }
-    mapComment(comment: WithId<CommentDBType>/*, userLikeStatus?: likeStatus*/): CommentViewModel {
+    mapComment(comment: CommentDocument/*, userLikeStatus?: likeStatus*/): CommentViewModel {
         return {
-            id: comment._id.toString(),
+            id: comment.id,
             content: comment.content,
             createdAt: comment.createdAt,
             commentatorInfo: comment.commentatorInfo,

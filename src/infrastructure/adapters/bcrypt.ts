@@ -2,7 +2,7 @@ const bcrypt = require('bcrypt');
 import { Injectable } from '@nestjs/common';
 
 @Injectable()
-export class BcryptService implements IBcryptService {
+export class BcryptService /*implements IBcryptService */{
     async createHashPassword(password: string) {
         const saltRounds = 10;
         const salt = await bcrypt.genSalt(saltRounds);

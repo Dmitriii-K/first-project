@@ -1,6 +1,6 @@
-import { UserDBModel } from "src/base/types/user.types";
 import { UserInputModel, TypeUserPagination } from "./input.models";
 import { UserViewModel, PaginatorUserViewModel } from "./output.models";
+import { UserDocument } from "../../domain/user.entity";
 
 export interface IUserService {
     createUser(user: UserInputModel): Promise<string | false>;
@@ -13,8 +13,8 @@ export interface IUserQueryRepository {
 }
 
 export interface IUserRepository {
-    findUserByLogiOrEmail(data: { login: string, email: string }): Promise<UserDBModel | null>; // any?
-    insertUser(user: UserDBModel): Promise<string>;
+    findUserByLogiOrEmail(data: { login: string, email: string }): Promise<UserDocument | null>;
+    insertUser(user: UserDocument): Promise<string>;
     deleteUser(id: string): Promise<boolean>;
 }
 

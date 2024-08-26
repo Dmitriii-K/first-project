@@ -7,7 +7,7 @@ export class User {
     login: string;
 
     @Prop({ type: String, required: true})
-    passwordHash: string;
+    password: string;
 
     @Prop({ type: String, required: true})
     email: string;

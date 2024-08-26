@@ -40,10 +40,8 @@ likesInfo: LikesCount;
 }
 
 export const CommentSchema = SchemaFactory.createForClass(Comment);
+CommentSchema.loadClass(Comment);
 
-// export const CommentSchema = SchemaFactory.createForClass(Comment);
-// CommentSchema.loadClass(Comment);
+export type CommentDocument = HydratedDocument<Comment>;
 
-// export type CommentDocument = HydratedDocument<Comment>;
-
-// export type CommentModelType = Model<CommentDocument>
+export type CommentModelType = Model<CommentDocument>

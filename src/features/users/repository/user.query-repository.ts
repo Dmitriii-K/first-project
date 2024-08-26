@@ -1,14 +1,13 @@
 import { userPagination } from "src/base/models/user.models";
-import { UserDBModel } from "src/base/types/user.types";
 import { TypeUserPagination } from "../api/models/input.models";
 import { PaginatorUserViewModel, UserViewModel } from "../api/models/output.models";
 import { InjectModel } from "@nestjs/mongoose";
-import { User, UserModelType } from "../domain/user.entity";
+import { User, UserDocument, UserModelType } from "../domain/user.entity";
 import { Injectable } from "@nestjs/common";
 import { IUserQueryRepository } from "../api/models/interface";
 
 @Injectable()
-export class UserQueryRepository implements IUserQueryRepository {
+export class UserQueryRepository /*implements IUserQueryRepository */{
     constructor(@InjectModel(User.name) private userModel: UserModelType) {}
 
     async getUserById(userId: string) {
@@ -28,7 +27,7 @@ export class UserQueryRepository implements IUserQueryRepository {
             : {};
 
         const filter = { $or: [searchLogin, searchEmail] };
-        const items: WithId<UserDBModel>[] = await this.userModel
+        const items: UserDocument[] = await this.userModel
             .find(filter)
             .sort({ [queryParams.sortBy]: queryParams.sortDirection })
             .skip((queryParams.pageNumber - 1) * queryParams.pageSize)
@@ -44,12 +43,12 @@ export class UserQueryRepository implements IUserQueryRepository {
         };
         return newUser;
     }
-    mapUser(user: WithId<UserDBModel>): UserViewModel {
+    mapUser(user: UserDocument): UserViewModel {
         return {
             id: user.id,
             login: user.login,
             email: user.email,
-            createdAt: user.createdAt,
+            createdAt: user.createdAt.toISOString(),
         };
     }
 }

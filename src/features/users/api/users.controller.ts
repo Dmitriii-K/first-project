@@ -1,14 +1,16 @@
-import { Body, Controller, Delete, Get, HttpCode, NotFoundException, Param, Post, Query } from "@nestjs/common";
+import { BadRequestException, Body, Controller, Delete, Get, HttpCode, NotFoundException, Param, Post, Query } from "@nestjs/common";
 import { TypeUserPagination, UserInputModel } from "./models/input.models";
 import { PaginatorUserViewModel, UserViewModel } from "./models/output.models";
 import { IUserQueryRepository, IUserService } from "./models/interface";
+import { UserService } from "../application/user.service";
+import { UserQueryRepository } from "../repository/user.query-repository";
 
 
 @Controller('users')
 export class UserController {
     constructor(
-        protected userService: IUserService,
-        protected userQueryRepository: IUserQueryRepository) {}
+        protected userService: UserService,
+        protected userQueryRepository: UserQueryRepository) {}
 
     @Get()
     async getUsers(@Query() query: TypeUserPagination) {
@@ -18,10 +20,9 @@ export class UserController {
     @Post()
     async createUser(@Body() body: UserInputModel) {
             const createResult = await this.userService.createUser(body);
-            // if (!createResult) {
-            //     res.status(400).json({ errorsMessages: [{ message: 'email and login should be unique', field: 'email and login' }] });
-            //     return;
-            // }
+            if (!createResult) {
+                throw new BadRequestException({ errorsMessages: [{ message: 'email and login should be unique', field: 'email and login' }] })
+            }
             const newUserDB: UserViewModel | null = await this.userQueryRepository.getUserById(createResult);
             return newUserDB;
     }

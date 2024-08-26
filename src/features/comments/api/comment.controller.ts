@@ -1,12 +1,13 @@
 import { Controller, Get, NotFoundException, Param } from "@nestjs/common";
 import { CommentViewModel } from "./models/output.model";
 import { ICommentQueryRepository } from "./models/interface";
+import { CommentQueryRepository } from "../repository/comment.query-repository";
 
 
 @Controller('comments')
 export class CommentController {
     constructor(
-        protected commentQueryRepository: ICommentQueryRepository
+        protected commentQueryRepository: CommentQueryRepository
     ) {}
 
     @Get(':id')

@@ -1,9 +1,10 @@
 import { Injectable } from "@nestjs/common";
 import { ICommentRepository, ICommentService } from "../api/models/interface";
+import { CommentRepository } from "../repository/comment.repository";
 
 @Injectable()
 export class CommentService /*implements ICommentService*/{
-    constructor(protected commentRepository: ICommentRepository) {}
+    constructor(protected commentRepository: CommentRepository) {}
 
     // async findUserByComment(id: string) {
     //     const user = await this.commentRepository.findUserByComment(id);

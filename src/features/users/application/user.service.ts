@@ -1,14 +1,16 @@
 import { Injectable } from "@nestjs/common";
 import { UserInputModel } from "../api/models/input.models";
-import { UserDBModel } from "src/base/types/user.types";
 import { IBcryptService, IUserRepository, IUserService } from "../api/models/interface";
+import { UserDocument } from "../domain/user.entity";
+import { BcryptService } from "src/infrastructure/adapters/bcrypt";
+import { UserRepository } from "../repository/user.repository";
 
 
 @Injectable()
-export class UserService implements IUserService{
+export class UserService /*implements IUserService*/{
     constructor(
-        protected userRepository: IUserRepository,
-        protected bcryptService: IBcryptService) {}
+        protected userRepository: UserRepository,
+        protected bcryptService: BcryptService) {}
 
     async createUser(data: UserInputModel) {
         const userExist = await this.userRepository.findUserByLogiOrEmail({ login: data.login, email: data.email });
@@ -17,8 +19,8 @@ export class UserService implements IUserService{
         }
         const userPassword = await this.bcryptService.createHashPassword(data.password);
 
-        const createDate = new Date().toISOString();
-        const newUser: UserDBModel = {
+        const createDate = new Date();
+        const newUser: UserDocument = {
             login: data.login,
             password: userPassword,
             email: data.email,

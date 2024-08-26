@@ -6,7 +6,7 @@ import { User, UserSchema } from './features/users/domain/user.entity';
 import { UserQueryRepository } from './features/users/repository/user.query-repository';
 import { UserController } from './features/users/api/users.controller';
 import { UserService } from './features/users/application/user.service';
-import { BcryptService } from './infrastructure/utils/bcrypt';
+import { BcryptService } from './infrastructure/adapters/bcrypt';
 import { UserRepository } from './features/users/repository/user.repository';
 import { SETTINGS } from './settings/app-settings';
 import { CommentController } from './features/comments/api/comment.controller';
