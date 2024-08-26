@@ -4,8 +4,8 @@ import { CommentRepository } from "src/features/comments/repository/comment.repo
 import { Post, PostDocument, PostModelType } from "../domain/post.entity";
 import { CommentDocument, CommentModelType } from "src/features/comments/domain/comment.entity";
 import { likeStatus, LikesType } from "src/base/types/like.types";
-import { CommentViewModel } from "src/features/comments/api/models/output.model";
-import { PostViewModel } from "../api/models/output.model";
+import { CommentViewModel, PaginatorCommentViewModelDB } from "src/features/comments/api/models/output.model";
+import { PaginatorPostViewModel, PostViewModel } from "../api/models/output.model";
 import { TypePostHalper } from "src/base/types/post.types";
 import { postPagination } from "src/base/models/post.model";
 import { commentsPagination } from "src/base/models/comment.model";
@@ -19,7 +19,7 @@ export class PostQueryRepository {
         @InjectModel(Comment.name) private commentModel: CommentModelType
     ) {}
 
-    async getAllPosts(helper: TypePostHalper, user: PostDocument | null) {
+    async getAllPosts(helper: TypePostHalper/*, user: PostDocument | null*/): Promise<PaginatorPostViewModel> {
         const queryParams = postPagination(helper);
         const posts: PostDocument[] = (await this.postModel
             .find({})
@@ -47,7 +47,7 @@ export class PostQueryRepository {
             items,
         };
     }
-    async findPostById(postId: string, userId: string | null) {
+    async findPostById(postId: string/*, userId: string | null*/) {
         const post = await this.postModel.findOne({ _id: postId });
         if (!post) {
             return null;
@@ -67,7 +67,7 @@ export class PostQueryRepository {
         }
         return this.mapComment(comment);
     }
-    async findCommentByPost(helper: TypePostHalper, id: string, userId: string | null) {
+    async findCommentByPost(helper: TypePostHalper, id: string/*, userId: string | null*/): Promise<PaginatorCommentViewModelDB> {
         const queryParams = commentsPagination(helper);
         const comments: CommentDocument[] = await this.commentModel
             .find({ postId: id })

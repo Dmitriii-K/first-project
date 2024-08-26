@@ -17,7 +17,7 @@ export class UserQueryRepository /*implements IUserQueryRepository */{
         }
         return this.mapUser(user);
     }
-    async getAllUsers(sortData: TypeUserPagination) {
+    async getAllUsers(sortData: TypeUserPagination): Promise<PaginatorUserViewModel> {
         const queryParams = userPagination(sortData);
         const searchEmail = sortData.searchEmailTerm
             ? { email: { $regex: sortData.searchEmailTerm, $options: "i" } }

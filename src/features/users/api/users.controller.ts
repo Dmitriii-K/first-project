@@ -14,24 +14,24 @@ export class UserController {
 
     @Get()
     async getUsers(@Query() query: TypeUserPagination) {
-            const users: PaginatorUserViewModel = await this.userQueryRepository.getAllUsers(query);
-            return users;
+        const users: PaginatorUserViewModel = await this.userQueryRepository.getAllUsers(query);
+        return users;
     }
     @Post()
     async createUser(@Body() body: UserInputModel) {
-            const createResult = await this.userService.createUser(body);
-            if (!createResult) {
-                throw new BadRequestException({ errorsMessages: [{ message: 'email and login should be unique', field: 'email and login' }] })
-            }
-            const newUserDB: UserViewModel | null = await this.userQueryRepository.getUserById(createResult);
-            return newUserDB;
+        const createResult = await this.userService.createUser(body);
+        if (!createResult) {
+            throw new BadRequestException({ errorsMessages: [{ message: 'email and login should be unique', field: 'email and login' }] })
+        }
+        const newUserDB: UserViewModel | null = await this.userQueryRepository.getUserById(createResult);
+        return newUserDB;
     }
     @Delete()
     @HttpCode(204)
     async deleteUser(@Param('id') id: string) {
-            const deleteResult = await this.userService.deleteUser(id);
-            if (!deleteResult) {
-                throw new NotFoundException(`User with id ${id} not found`);
-            }
+        const deleteResult = await this.userService.deleteUser(id);
+        if (!deleteResult) {
+            throw new NotFoundException('User is not found');
+        }
     }
 }

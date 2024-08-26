@@ -1,8 +1,8 @@
 import { Injectable } from "@nestjs/common";
 import { likeStatus, LikesType, NewestLikesType } from "src/base/types/like.types";
 import { CommentRepository } from "src/features/comments/repository/comment.repository";
-import { BlogViewModel } from "../api/models/output.model";
-import { PostViewModel } from "src/features/posts/api/models/output.model";
+import { BlogViewModel, PaginatorBlogViewModel } from "../api/models/output.model";
+import { PaginatorPostViewModel, PostViewModel } from "src/features/posts/api/models/output.model";
 import { TypeBlogHalper, TypePostForBlogHalper } from "src/base/types/blog.types";
 import { InjectModel } from "@nestjs/mongoose";
 import { Blog, BlogDocument, BlogModelType } from "../domain/blog.entity";
@@ -17,7 +17,7 @@ export class BlogQueryRepository {
     @InjectModel(Post.name) private postModel: PostModelType
     ) {}
 
-    async getAllBlogs(helper: TypeBlogHalper) {
+    async getAllBlogs(helper: TypeBlogHalper): Promise <PaginatorBlogViewModel> {
         const queryParams = blogPagination(helper);
         const search = helper.searchNameTerm
             ? { name: { $regex: helper.searchNameTerm, $options: "i" } }
@@ -52,7 +52,7 @@ export class BlogQueryRepository {
         }
         return this.mapPost(post);
     }
-    async getPostFofBlog(helper: TypePostForBlogHalper, id: string, userId: string | null) {
+    async getPostFofBlog(helper: TypePostForBlogHalper, id: string/*, userId: string | null*/): Promise<PaginatorPostViewModel> {
         const queryParams = blogPagination(helper);
         const posts: PostDocument[] = await this.postModel
             .find({ blogId: id })

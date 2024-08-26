@@ -12,11 +12,11 @@ export class CommentController {
 
     @Get(':id')
     async getComment(@Param('id') id: string) {
-            // const userId: string | null = req.user ? req.user._id.toString() : null;
-            const comment: CommentViewModel | null = await this.commentQueryRepository.findCommentById(id/*, userId*/);
-            if (!comment) {
-                throw new NotFoundException(`Comment with id ${id} not found`);
-            }
+        // const userId: string | null = req.user ? req.user._id.toString() : null;
+        const comment: CommentViewModel | null = await this.commentQueryRepository.findCommentById(id/*, userId*/);
+        if (!comment) {
+            throw new NotFoundException(`Comment is not found`);
+        }
     }
     // async updateComment(req: Request<ComId, {}, CommentInputModel>, res: Response) {
     //     try {

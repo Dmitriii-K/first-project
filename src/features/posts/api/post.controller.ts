@@ -1,28 +1,73 @@
-import { Controller, Delete, Get, Post, Put } from "@nestjs/common";
+import { Body, Controller, Delete, Get, HttpCode, NotFoundException, Param, Post, Put, Query } from "@nestjs/common";
 import { PostService } from "../application/post.service";
 import { PostQueryRepository } from "../repository/post.query-repository";
+import { TypePostHalper } from "src/base/types/post.types";
+import { PostInputModel } from "./models/input.model";
 
 
-@Controller()
+@Controller('posts')
 export class PostController {
     constructor(
         protected postService: PostService,
-        protected postQueryRepository: PostQueryRepository
-    ) {}
+        protected postQueryRepository: PostQueryRepository) {}
 
-    // @Post()
-    // async createPost() {
-    //         const userId: string | null = req.user ? req.user._id.toString() : null;
-    //         const createResult = await this.postService.createPost(req.body, req.body.blogId); // запрос на проверку BlogId в middleware
-    //         if (!createResult) {
-    //             res.sendStatus(404);
-    //             return;
-    //         }
-    //         const newPost = await this.postQueryRepository.findPostById(createResult, userId);
-    //         if (newPost)
-    //             res.status(201).json(newPost);
-    // }
-    // @Post(':id')
+    @Get(':id/comments')
+    async getCommentByPost(
+        @Query() query: TypePostHalper,
+        @Param('id') id: string) {
+        // const userId: string | null = req.user ? req.user._id.toString() : null;
+        const comments = await this.postQueryRepository.findCommentByPost(query, id/*, userId*/);
+        if (comments.items.length < 1) {
+            throw new NotFoundException('comment is not exists');
+            }
+            return comments;
+    }
+    @Get()
+    async getPosts(@Query() query: TypePostHalper) {
+        // const user = req.user ? req.user : null;
+        const posts = await this.postQueryRepository.getAllPosts(query/*, user*/);
+        return posts;
+    }
+    @Post()
+    async createPost(@Body() body: PostInputModel) {
+        // const userId: string | null = req.user ? req.user._id.toString() : null;
+        const createResult = await this.postService.createPost(body, body.blogId); // запрос на проверку BlogId в middleware
+        if (!createResult) {
+            throw new NotFoundException('Post not create');
+        }
+        const newPost = await this.postQueryRepository.findPostById(createResult/*, userId*/);
+        return newPost;
+    }
+    @Get(':id')
+    async getPostById(@Param('id') id: string) {
+        // const userId: string | null = req.user ? req.user._id.toString() : null;
+        const postResult = await this.postQueryRepository.findPostById(id/*, userId*/);
+        if (postResult) {
+            throw new NotFoundException('post is not found');
+        }
+        return postResult;
+    }
+    @Put(':id')
+    @HttpCode(204)
+    async updatePost(
+        @Param('id') id: string,
+        @Body() body: PostInputModel) {
+            const findPost = await this.postService.findPostById(id);
+            if (!findPost) {
+                throw new NotFoundException('post is not found');
+            }
+            const updateResult = await this.postService.updatePost(body, id);
+            return updateResult;
+    }
+    @Delete(':id')
+    @HttpCode(204)
+    async deletePost(@Param('id') id: string) {
+        const deleteResult = await this.postService.deletePost(id);
+        if (deleteResult) {
+            throw new NotFoundException('post is not found');
+        }
+    }
+    // @Post(':id/comments')
     // async createCommentByPostId() {
     //         const createResult = await this.postService.createCommentByPost(req.params.id, req.body, req.user);
     //         if (!createResult) {
@@ -33,36 +78,7 @@ export class PostController {
     //         if (newComment)
     //             res.status(201).json(newComment);
     // }
-    // @Get()
-    // async getPosts() {
-    //         const user = req.user ? req.user : null;
-    //         const posts = await this.postQueryRepository.getAllPosts(req.query, user);
-    //         res.status(200).json(posts);
-
-    // }
-    // @Get(':id')
-    // async getPostById() {
-    //         const userId: string | null = req.user ? req.user._id.toString() : null;
-    //         const postResult = await this.postQueryRepository.findPostById(req.params.id, userId);
-    //         if (postResult) {
-    //             res.status(200).json(postResult);
-    //         } else {
-    //             res.sendStatus(404);
-    //             return;
-    //         }
-    // }
-    // @Get(':id')
-    // async getCommentByPost() {
-    //         const userId: string | null = req.user ? req.user._id.toString() : null;
-    //         const comments = await this.postQueryRepository.findCommentByPost(req.query, req.params.id, userId);
-    //         if (comments.items.length < 1) {
-    //             res.sendStatus(404);
-    //             return;
-    //         } else {
-    //             res.status(200).json(comments);
-    //         }
-    // }
-    // @Put(':id')
+    // @Put(':id/like-status')
     // async updateLikeStatus() {
     //         const user = req.user ? req.user : null;
     //         const post = await this.postService.findPostById(req.params.id);
@@ -77,27 +93,5 @@ export class PostController {
     //         }
     //         res.sendStatus(204);
     //         return;
-    // }
-    // @Put(':id')
-    // async updatePost() {
-    //         const findPost = await this.postService.findPostById(req.params.id);
-    //         if (!findPost) {
-    //             res.sendStatus(404);
-    //             return;
-    //         }
-    //         const updateResult = await this.postService.updatePost(req.body, req.params.id);
-    //         if (updateResult) {
-    //             res.sendStatus(204);
-    //         }
-    // }
-    // @Delete(':id')
-    // async deletePost() {
-    //         const deleteResult = await this.postService.deletePost(req.params.id);
-    //         if (deleteResult) {
-    //             res.sendStatus(204);
-    //         } else {
-    //             res.sendStatus(404);
-    //             return;
-    //         }
     // }
 }

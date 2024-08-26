@@ -116,4 +116,7 @@ export class PostService {
     async getPostById(postId: string) {
         return this.postRepository.findPostById(postId);
     }
+    async findPostById(postId: string) {
+        return this.postRepository.findPostById(postId);
+    }
 }
