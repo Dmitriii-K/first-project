@@ -4,13 +4,17 @@ import { BlogQueryRepository } from "../repository/blog.query-repository";
 import { TypeBlogHalper, TypePostForBlogHalper } from "src/base/types/blog.types";
 import { PaginatorBlogViewModel } from "./models/output.model";
 import { BlogInputModel, BlogPostInputModel } from "./models/input.model";
+import { BlogRepository } from "../repository/blog.repository";
+import { BlogExistsPipe } from "src/infrastructure/pipes/blogExists.pipe";
 
 
 @Controller('blogs')
 export class BlogController {
     constructor(
         protected blogService: BlogService,
-        protected blogQueryRepository: BlogQueryRepository) {}
+        protected blogQueryRepository: BlogQueryRepository,
+        protected blogRepository: BlogRepository
+    ) {}
 
     @Get()
     async getAllBlogs(@Query() query: TypeBlogHalper) {
@@ -29,15 +33,12 @@ export class BlogController {
     @Get(':id/posts')
     async getPostForBlog(
         @Query() query: TypePostForBlogHalper,
-        @Param('id') id: string) {
+        @Param('id', BlogExistsPipe) id: string) {
             // const userId: string | null = req.user ? req.user._id.toString() : null;
-            const posts = await this.blogQueryRepository.getPostFofBlog(query, id/*, userId*/);
-            if (!posts.items) {
-                throw new NotFoundException('blog is not exists');
-            }
-            return posts;
+            
+            return await this.blogQueryRepository.getPostFofBlog(query, id/*, userId*/);
     }
-    @Post(':id')
+    @Post(':id/posts')
     async createPostForBlog(
         @Param('id') id: string,
         @Body() body: BlogPostInputModel) {

@@ -1,7 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { ICommentQueryRepository, ICommentRepository } from "../api/models/interface";
 import { InjectModel } from "@nestjs/mongoose";
-import { CommentDBType } from "src/base/types/comment.types";
 import { likeStatus } from "src/base/types/like.types";
 import { CommentViewModel } from "../api/models/output.model";
 import { Comment, CommentDocument, CommentModelType } from "../domain/comment.entity";

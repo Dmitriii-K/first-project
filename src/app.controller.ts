@@ -1,4 +1,4 @@
-import { Controller, Delete, Get, HttpCode } from '@nestjs/common';
+import { Controller, Get, } from '@nestjs/common';
 import { AppService } from './app.service';
 
 @Controller()
@@ -8,11 +8,5 @@ export class AppController {
   @Get()
   getHello(): string {
     return this.appService.getHello();
-  }
-
-  @Delete('all-data')
-  @HttpCode(204)
-  async deleteAllData(): Promise<void> {
-    await this.appService.deleteAllData();
   }
 }

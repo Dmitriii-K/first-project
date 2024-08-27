@@ -24,6 +24,8 @@ import { PostRepository } from './features/posts/repository/post.repository';
 import { PostQueryRepository } from './features/posts/repository/post.query-repository';
 import { BlogController } from './features/blogs/api/blog.controller';
 import { PostController } from './features/posts/api/post.controller';
+import { TestingController } from './features/testing/testing.controller';
+import { TestingService } from './features/testing/testing.service';
 
 @Module({
   imports: [
@@ -35,9 +37,14 @@ import { PostController } from './features/posts/api/post.controller';
       { name: Post.name, schema: PostSchema }
     ]),
   ],
-  controllers: [AppController, UserController, CommentController, BlogController, PostController],
+  controllers: [AppController, UserController, CommentController, BlogController, PostController, TestingController],
   providers: [
+    // {
+    //   provide: Types.IUserService,
+    //   useClass: UserService
+    // },
     AppService,
+    TestingService,
     UserService, UserQueryRepository, UserRepository,
     BcryptService,
     CommentService, CommentQueryRepository, CommentRepository,

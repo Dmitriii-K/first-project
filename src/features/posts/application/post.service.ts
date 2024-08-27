@@ -96,14 +96,6 @@ export class PostService {
             return false;
         }
     }
-    async deletePost(id: string) {
-        const result = await this.postRepository.deletePost(id);
-        if (result) {
-            return true;
-        } else {
-            return false;
-        }
-    }
     async getPostById(postId: string) {
         return this.postRepository.findPostById(postId);
     }

@@ -3,13 +3,16 @@ import { PostService } from "../application/post.service";
 import { PostQueryRepository } from "../repository/post.query-repository";
 import { TypePostHalper } from "src/base/types/post.types";
 import { PostInputModel } from "./models/input.model";
+import { PostRepository } from "../repository/post.repository";
 
 
 @Controller('posts')
 export class PostController {
     constructor(
         protected postService: PostService,
-        protected postQueryRepository: PostQueryRepository) {}
+        protected postQueryRepository: PostQueryRepository,
+        protected postRepository: PostRepository,
+    ) {}
 
     @Get(':id/comments')
     async getCommentByPost(
@@ -40,9 +43,10 @@ export class PostController {
     }
     @Get(':id')
     async getPostById(@Param('id') id: string) {
+
         // const userId: string | null = req.user ? req.user._id.toString() : null;
         const postResult = await this.postQueryRepository.findPostById(id/*, userId*/);
-        if (postResult) {
+        if (!postResult) {
             throw new NotFoundException('post is not found');
         }
         return postResult;
@@ -62,8 +66,8 @@ export class PostController {
     @Delete(':id')
     @HttpCode(204)
     async deletePost(@Param('id') id: string) {
-        const deleteResult = await this.postService.deletePost(id);
-        if (deleteResult) {
+        const deleteResult = await this.postRepository.deletePost(id);
+        if (!deleteResult) {
             throw new NotFoundException('post is not found');
         }
     }

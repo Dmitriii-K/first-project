@@ -10,32 +10,10 @@ export class BlogService {
     constructor(protected blogRepository: BlogRepository) {}
 
     async createBlog(data: BlogInputModel) {
-        // const createDate = new Date().toISOString();
-        // const newBlog: BlogDocument = {
-        //     name: data.name,
-        //     description: data.description,
-        //     websiteUrl: data.websiteUrl,
-        //     createdAt: createDate,
-        //     isMembership: false,
-        // };
         const newBlog: Blog = Blog.createBlog(data.name, data.description, data.websiteUrl);
         return this.blogRepository.insertBlog(newBlog);
     }
     async createPostForBlog(blogId: string, data: BlogPostInputModel, name: string) {
-        // const createDate = new Date().toISOString();
-        // const newPost: PostDocument = {
-        //     title: data.title,
-        //     shortDescription: data.shortDescription,
-        //     content: data.content,
-        //     blogId: blogId,
-        //     blogName: name,
-        //     createdAt: createDate,
-        //     extendedLikesInfo: {
-        //         likesCount: 0,
-        //         dislikesCount: 0,
-        //         newestLikes: []
-        //     }
-        // };
         const newPost: Post = Post.createPost(data.title, data.shortDescription, data.content, blogId, name);
         return this.blogRepository.insertPostForBlog(newPost);
     }

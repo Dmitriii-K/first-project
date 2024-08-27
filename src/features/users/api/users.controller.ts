@@ -26,7 +26,7 @@ export class UserController {
         const newUserDB: UserViewModel | null = await this.userQueryRepository.getUserById(createResult);
         return newUserDB;
     }
-    @Delete()
+    @Delete(':id')
     @HttpCode(204)
     async deleteUser(@Param('id') id: string) {
         const deleteResult = await this.userService.deleteUser(id);
