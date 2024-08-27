@@ -1,7 +1,7 @@
 import { CommentatorInfo } from "src/base/types/comment.types";
 import { likeStatus } from "src/base/types/like.types";
 
-export type CommentViewModel = {
+export class CommentViewModel {
     id:string;
     content:	string;
     createdAt:	string;
@@ -13,7 +13,7 @@ export type CommentViewModel = {
     }
 }
 
-export type PaginatorCommentViewModelDB = {
+export class PaginatorCommentViewModelDB {
     pagesCount:	number;
     page:	number;
     pageSize:	number;

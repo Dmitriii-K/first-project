@@ -1,4 +1,4 @@
-export type BlogViewModel = {
+export class BlogViewModel {
     id: string;
     name: string;
     description: string;
@@ -7,7 +7,7 @@ export type BlogViewModel = {
     isMembership: boolean;
 }
 
-export type PaginatorBlogViewModel = {
+export class PaginatorBlogViewModel {
     pagesCount: number;
     page: number;
     pageSize: number;

@@ -95,7 +95,7 @@ export class PostQueryRepository {
             items,
         };
     }
-    mapPost(post: PostDocument, userLikeStatus?: likeStatus, allLikes?: LikesType[]): PostViewModel {
+    mapPost(post: PostDocument/*, userLikeStatus?: likeStatus, allLikes?: LikesType[]*/): PostViewModel {
         // const newestLikes: NewestLikesType[] = [];
 
         // if (allLikes) {
@@ -123,7 +123,7 @@ export class PostQueryRepository {
             extendedLikesInfo: {
                 likesCount: post.extendedLikesInfo.likesCount,
                 dislikesCount: post.extendedLikesInfo.dislikesCount,
-                myStatus: userLikeStatus || likeStatus.None,
+                myStatus: /*userLikeStatus || */likeStatus.None,
                 newestLikes: newestLikes
             },
         };

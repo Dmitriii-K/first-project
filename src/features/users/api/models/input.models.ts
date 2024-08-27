@@ -1,4 +1,4 @@
-export type TypeUserPagination = {
+export class TypeUserPagination { // или Интерфейс?
     searchLoginTerm: string;
     searchEmailTerm: string;
     sortBy: string;
@@ -7,7 +7,7 @@ export type TypeUserPagination = {
     pageSize: number;
 }
 
-export type UserInputModel = {
+export class UserInputModel {
     login: string;
     password: string;
     email: string;

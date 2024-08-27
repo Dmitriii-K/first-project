@@ -4,7 +4,7 @@ export enum likeStatus {
     Dislike = 'Dislike'
 }
 
-export type LikesType = {
+export class LikesType {
     addedAt: string;
     commentId: string;
     userId: string;
@@ -12,13 +12,13 @@ export type LikesType = {
     status: likeStatus
 }
 
-export type LikesCount = {
-    likesCount: number,
-    dislikesCount: number,
+export class LikesCount {
+    likesCount: number;
+    dislikesCount: number;
 }
 
-export type NewestLikesType = {
-    addedAt: string,
+export class NewestLikesType {
+    addedAt: string;
     userId: string;
     login: string
 }

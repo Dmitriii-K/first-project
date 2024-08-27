@@ -1,8 +1,7 @@
+import { TypeUserPagination } from "src/features/users/api/models/input.models";
 import { SortDirection } from "../types/user.types";
 
-export const userPagination = (query: {
-    [key: string]: string | number | undefined;
-}): any => {
+export const userPagination = (query: TypeUserPagination): any => {
     return {
     pageNumber: query.pageNumber ? +query.pageNumber : 1,
     pageSize: query.pageSize ? +query.pageSize : 10,
@@ -13,4 +12,4 @@ export const userPagination = (query: {
     searchLoginTerm: query.searchLoginTerm ? query.searchLoginTerm : null,
     searchEmailTerm: query.searchEmailTerm ? query.searchEmailTerm : null,
     };
-};
+}

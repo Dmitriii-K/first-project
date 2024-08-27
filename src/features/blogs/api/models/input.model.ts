@@ -1,10 +1,10 @@
-export type BlogInputModel = {
+export class BlogInputModel {
     name: string;
     description: string;
     websiteUrl: string;
 }
 
-export type BlogPostInputModel = {
+export class BlogPostInputModel {
     title: string;
     shortDescription: string;
     content: string;

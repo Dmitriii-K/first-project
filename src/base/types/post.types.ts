@@ -1,4 +1,4 @@
-export type TypePostHalper = {
+export class TypePostHalper {
     sortBy: string;
     sortDirection: string;
     pageNumber: number;

@@ -1,4 +1,4 @@
-export type TypeBlogHalper = {
+export class TypeBlogHalper {
     searchNameTerm: string;
     sortBy: string;
     sortDirection: string;
@@ -6,7 +6,7 @@ export type TypeBlogHalper = {
     pageSize: number;
 }
 
-export type TypePostForBlogHalper = {
+export class TypePostForBlogHalper {
     sortBy: string;
     sortDirection: string;
     pageNumber: number;

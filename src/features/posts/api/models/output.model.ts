@@ -1,6 +1,6 @@
 import { likeStatus, NewestLikesType } from "src/base/types/like.types";
 
-export type PostViewModel = {
+export class PostViewModel {
     id: string;
     title: string;
     shortDescription: string;
@@ -13,10 +13,10 @@ export type PostViewModel = {
         dislikesCount: number,
         myStatus: likeStatus,
         newestLikes: NewestLikesType[]
-    },
+    }
 }
 
-export type PaginatorPostViewModel = {
+export class PaginatorPostViewModel {
     pagesCount: number;
     page: number;
     pageSize: number;

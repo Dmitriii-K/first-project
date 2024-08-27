@@ -1,11 +1,11 @@
 import { LikesCount } from "./like.types";
 
-export type CommentatorInfo = {
+export class CommentatorInfo {
     userId:	string;
     userLogin:	string;
 }
 
-export type CommentDBType = {
+export class CommentDBType {
     postId?: string;
     content:	string;
     createdAt:	string;

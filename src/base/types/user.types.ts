@@ -3,12 +3,12 @@ export enum SortDirection {
     desc,
 }
 
-export type EmailConfirmationType = {
+export class EmailConfirmationType {
     confirmationCode: string;
     expirationDate: string;
     isConfirmed: boolean;
 }
-export type UserDBModel = {
+export class UserDBModel {
     login: string;
     password: string;
     email: string;

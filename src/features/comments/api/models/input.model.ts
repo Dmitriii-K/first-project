@@ -1,3 +1,3 @@
-export type CommentInputModel = {
-    content:	string;
+export class CommentInputModel {
+    content: string;
 }
