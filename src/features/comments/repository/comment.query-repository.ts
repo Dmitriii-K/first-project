@@ -4,7 +4,7 @@ import { InjectModel } from "@nestjs/mongoose";
 import { CommentDBType } from "src/base/types/comment.types";
 import { likeStatus } from "src/base/types/like.types";
 import { CommentViewModel } from "../api/models/output.model";
-import { CommentDocument, CommentModelType } from "../domain/comment.entity";
+import { Comment, CommentDocument, CommentModelType } from "../domain/comment.entity";
 import { CommentRepository } from "./comment.repository";
 
 @Injectable()

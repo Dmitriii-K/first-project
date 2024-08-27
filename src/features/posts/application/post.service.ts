@@ -4,7 +4,7 @@ import { PostRepository } from "../repository/post.repository";
 import { PostInputModel } from "../api/models/input.model";
 import { UserDocument } from "src/features/users/domain/user.entity";
 import { likeStatus } from "src/base/types/like.types";
-import { PostDocument } from "../domain/post.entity";
+import { Post, PostDocument } from "../domain/post.entity";
 import { CommentInputModel } from "src/features/comments/api/models/input.model";
 import { CommentDocument } from "src/features/comments/domain/comment.entity";
 
@@ -18,20 +18,11 @@ export class PostService {
 
     async createPost(data: PostInputModel, id: string) {
         const findBlogNameForId = await this.postRepository.findBlogNameForId(id);
-        const createDate = new Date().toISOString();
-        const newPost: PostDocument = {
-            title: data.title,
-            shortDescription: data.shortDescription,
-            content: data.content,
-            blogId: data.blogId,
-            blogName: findBlogNameForId!.name,
-            createdAt: createDate,
-            extendedLikesInfo: {
-                likesCount: 0,
-                dislikesCount: 0,
-                newestLikes: []
-            }
-        };
+        if (!findBlogNameForId) {
+            throw new Error('Blog not found');// Норм?
+        }
+        
+        const newPost: Post = Post.createPost(data.title, data.shortDescription, data.content, data.blogId, findBlogNameForId.name);
         return this.postRepository.insertPost(newPost);
     }
     // async createCommentByPost(paramId: string, data: CommentInputModel, user: UserDocument) {

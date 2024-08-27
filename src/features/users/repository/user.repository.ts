@@ -7,10 +7,13 @@ import { IUserRepository } from "../api/models/interface";
 export class UserRepository /*implements IUserRepository*/{
     constructor(@InjectModel(User.name) private userModel: UserModelType) {}
 
-    async insertUser(user: UserDocument) {
+    async insertUser(user: User) {
         const saveResult = await this.userModel.create(user);
         return saveResult._id.toString();
     }
+    // async saveUser(user: User): Promise<User> {
+    //     return user.save();
+    // }
     async findUserById(userId: string) {
         const user = await this.userModel.findOne({ _id: userId });
         if (!user) {
@@ -25,7 +28,7 @@ export class UserRepository /*implements IUserRepository*/{
         }
         return user
     }
-    async findUserByLogiOrEmail(data: { login: string, email: string }): Promise<UserDocument | null> {
+    async findUserByLogiOrEmail(data: { login: string, email: string }): Promise<User | null> {
         return this.userModel.findOne({ $or: [{ login: data.login }, { email: data.email }] });
     }
     async deleteUser(userId: string) {

@@ -11,11 +11,11 @@ export class BlogRepository {
         @InjectModel(Blog.name) private blogModel: BlogModelType,
         @InjectModel(Post.name) private postModel: PostModelType) {}
 
-    async insertBlog(data: BlogDocument) {
+    async insertBlog(data: Blog) {
         const result = this.blogModel.create(data);
         return (await result)._id.toString();
     }
-    async insertPostForBlog(data: PostDocument) {
+    async insertPostForBlog(data: Post) {
         const result = this.postModel.create(data);
         return (await result)._id.toString();
     }

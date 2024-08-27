@@ -13,7 +13,7 @@ import { CommentController } from './features/comments/api/comment.controller';
 import { CommentQueryRepository } from './features/comments/repository/comment.query-repository';
 import { CommentRepository } from './features/comments/repository/comment.repository';
 import { CommentService } from './features/comments/application/comment.service';
-import { CommentSchema } from './features/comments/domain/comment.entity';
+import { Comment, CommentSchema } from './features/comments/domain/comment.entity';
 import { Blog, BlogSchema } from './features/blogs/domain/blog.entity';
 import { BlogService } from './features/blogs/application/blog.service';
 import { BlogQueryRepository } from './features/blogs/repository/blog.query-repository';

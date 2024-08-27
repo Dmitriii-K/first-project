@@ -20,11 +20,11 @@ export class PostRepository {
     async findPostById(postId: string) {
         return this.postModel.findOne({ _id: postId });
     }
-    async insertPost(data: PostDocument) {
+    async insertPost(data: Post) {
         const result = this.postModel.create(data);
         return (await result)._id.toString();
     }
-    async insertComment(data: CommentDocument) {
+    async insertComment(data: Comment) {
         const result = this.commentModel.create(data);
         return (await result).id;
     }

@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import { ICommentRepository } from "../api/models/interface";
-import { CommentModelType } from "../domain/comment.entity";
+import { Comment, CommentModelType } from "../domain/comment.entity";
 
 @Injectable()
 export class CommentRepository /*implements ICommentRepository*/{

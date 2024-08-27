@@ -26,6 +26,17 @@ createdAt: string;
 
 @Prop({ required: true })
 isMembership: boolean;
+
+static createBlog(name: string, description: string, websiteUrl: string): Blog {
+    const blog = new this();
+    
+    blog.name = name;
+    blog.description = description;
+    blog.websiteUrl = websiteUrl;
+    blog.createdAt = new Date().toISOString();
+    blog.isMembership = false;
+    return blog;
+}
 }
 
 export const BlogSchema = SchemaFactory.createForClass(Blog);

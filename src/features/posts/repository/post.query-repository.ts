@@ -2,7 +2,7 @@ import { Injectable } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import { CommentRepository } from "src/features/comments/repository/comment.repository";
 import { Post, PostDocument, PostModelType } from "../domain/post.entity";
-import { CommentDocument, CommentModelType } from "src/features/comments/domain/comment.entity";
+import { Comment, CommentDocument, CommentModelType } from "src/features/comments/domain/comment.entity";
 import { likeStatus, LikesType } from "src/base/types/like.types";
 import { CommentViewModel, PaginatorCommentViewModelDB } from "src/features/comments/api/models/output.model";
 import { PaginatorPostViewModel, PostViewModel } from "../api/models/output.model";

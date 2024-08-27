@@ -18,18 +18,19 @@ export class User {
     // @Prop({type: emailConfirmationSchema, required: true})
     // emailConfirmation: emailConfirmationSchema;
 
-    /*  static createUser(login: string, email: string | null) {
+    static createUser(login: string, password: string, email: string): User {
         const user = new this();
-
+        
         user.login = login;
-        user.email = email ?? `${randomUUID()}_${login}@it-incubator.io`;
-
+        user.password = password;
+        user.email = email;
+        user.createdAt = new Date();
         return user;
     }
 
-    getLogin() {
-        return this.login;
-    }*/
+    // getLogin() {
+    //     return this.login;
+    // }
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
