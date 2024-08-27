@@ -12,7 +12,7 @@ export class PostViewModel {
         likesCount: number,
         dislikesCount: number,
         myStatus: likeStatus,
-        newestLikes: NewestLikesType[]
+        newestLikes: /*NewestLikesType*/[]
     }
 }
 

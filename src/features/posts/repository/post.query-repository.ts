@@ -124,7 +124,7 @@ export class PostQueryRepository {
                 likesCount: post.extendedLikesInfo.likesCount,
                 dislikesCount: post.extendedLikesInfo.dislikesCount,
                 myStatus: /*userLikeStatus || */likeStatus.None,
-                newestLikes: newestLikes
+                newestLikes: /*newestLikes*/[]
             },
         };
     }
