@@ -19,7 +19,7 @@ export class UserService /*implements IUserService*/{
         }
         const userPassword = await this.bcryptService.createHashPassword(data.password);
 
-        const newUser: User = User.createUser(data.login, userPassword, data.email) ;
+        const newUser: User = User.createUser(data.login, userPassword, data.email);
         return this.userRepository.insertUser(newUser);
         // return this.userRepository.saveUser(newUser);
     }

@@ -1,43 +1,49 @@
 import { Injectable } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import { ApiInfo, ApiInfoModelType } from "../domain/auth.entity";
+import { User, UserDocument, UserModelType } from "src/features/users/domain/user.entity";
+import { Session, SessionModelType } from "src/features/sessions/domain/session.entity";
 
 @Injectable()
 export class AuthRepository{
-    constructor(@InjectModel(ApiInfo.name) private apiModel: ApiInfoModelType) {}
+    constructor(
+        @InjectModel(ApiInfo.name) private apiModel: ApiInfoModelType,
+        @InjectModel(Session.name) private sessionModel: SessionModelType,
+        @InjectModel(User.name) private userModel: UserModelType,
+    ) {}
 
-    // async updateCode(userId: string, newCode: string) {
-    //     const result = await UserModel.updateOne({ _id: userId }, { $set: { 'emailConfirmation.confirmationCode': newCode } });
-    //     return result.modifiedCount === 1;
-    // }
-    // async updatePassword(userId: string, pass: string) {
-    //     const result = await UserModel.updateOne({ _id: userId }, { $set: { password: pass } });
-    //     return result.modifiedCount === 1;
-    // }
-    // async checkUserByRegistration(login: string, email: string) {
-    //     return UserModel.findOne({ $or: [{ login: login }, { email: email }] });
-    // }
-    // async findUserByLoginOrEmail(loginOrEmail: string) {
-    //     return UserModel.findOne({ $or: [{ login: loginOrEmail }, { email: loginOrEmail }] });
-    // }
-    // async createUser(user: UserDBModel) {
-    //     const saveResult = await UserModel.create(user);
-    //     return saveResult._id.toString();
-    // }
-    // async findUserByCode(code: string) {
-    //     return UserModel.findOne({ "emailConfirmation.confirmationCode": code });
-    // }
-    // async findUserByEmail(mail: string) {
-    //     return UserModel.findOne({ email: mail });
-    // }
-    // async updateConfirmation(_id: ObjectId) {
-    //     const result = await UserModel.updateOne({ _id }, { $set: { 'emailConfirmation.isConfirmed': true } });
-    //     return result.modifiedCount === 1;
-    // }
-    // async createSession(session: SessionsType) {
-    //     const saveResult = await SessionModel.create(session);
-    //     return saveResult._id.toString();
-    // }
+    async updateCode(userId: string, newCode: string) {
+        const result = await this.userModel.updateOne({ _id: userId }, { $set: { 'emailConfirmation.confirmationCode': newCode } });
+        return result.modifiedCount === 1;
+    }
+    async updatePassword(userId: string, pass: string) {
+        const result = await this.userModel.updateOne({ _id: userId }, { $set: { password: pass } });
+        return result.modifiedCount === 1;
+    }
+    async checkUserByRegistration(login: string, email: string): Promise<UserDocument | null> {
+        return this.userModel.findOne({ $or: [{ login: login }, { email: email }] });
+    }
+    async findUserByLoginOrEmail(loginOrEmail: string): Promise<UserDocument | null> {
+        return this.apiModel.findOne({ $or: [{ login: loginOrEmail }, { email: loginOrEmail }] });
+    }
+    async createUser(user: User) {
+        const saveResult = await this.userModel.create(user);
+        return saveResult._id.toString();
+    }
+    async findUserByCode(code: string): Promise<UserDocument | null> {
+        return this.userModel.findOne({ "emailConfirmation.confirmationCode": code });
+    }
+    async findUserByEmail(mail: string): Promise<UserDocument | null> {
+        return this.userModel.findOne({ email: mail });
+    }
+    async updateConfirmation(_id: string) {
+        const result = await this.userModel.updateOne({ _id }, { $set: { 'emailConfirmation.isConfirmed': true } });
+        return result.modifiedCount === 1;
+    }
+    async createSession(session: Session) {
+        const saveResult = await this.sessionModel.create(session);
+        return saveResult._id.toString();
+    }
     // async findSessionFromDeviceId(deviceId: string) {
     //     return SessionModel.findOne({ device_id: deviceId });
     // }

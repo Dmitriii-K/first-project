@@ -1,10 +1,12 @@
-import { Controller } from "@nestjs/common";
+import { Body, Controller, Get, HttpCode, Post, Req, Res, UnauthorizedException } from "@nestjs/common";
 import { AuthService } from "../application/auth.service";
 import { AuthRepository } from "../repository/auth.repository";
 import { BcryptService } from "src/infrastructure/adapters/bcrypt";
 import { JwtService } from "src/infrastructure/adapters/jwt.service";
+import { LoginInputModel, NewPasswordRecoveryInputModel, RegistrationConfirmationCodeModel, RegistrationEmailResending } from "./models/input.model";
+import { UserInputModel } from "src/features/users/api/models/input.models";
 
-@Controller()
+@Controller('auth')
 export class AuthController{
     constructor(
         protected authService: AuthService,
@@ -13,38 +15,46 @@ export class AuthController{
         protected jwtService: JwtService
     ) {}
 
-    // async authLoginUser() {
-    //         const authUser = await this.authService.checkCredentials(req.body.loginOrEmail);
-    //         if (!authUser) {
-    //             res.status(401).json({ errorsMessages: [{ field: 'user', message: 'user not found' }] });
-    //             return;
-    //         } else {
-    //             const isCorrect = await this.bcryptService.comparePasswords(req.body.password, authUser?.password);
-    //             if (isCorrect) {
-    //                 const { accessToken, refreshToken } = this.jwtService.generateToken(authUser);
-    //                 await this.authService.createSession(authUser._id.toString(), refreshToken, req.headers["user-agent"] || "unknown", req.ip || "unknown");
-    //                 res.cookie('refreshToken', refreshToken, { httpOnly: true, secure: true })
-    //                     .status(200).json({ accessToken });
-    //                 return;
-    //             } else {
-    //                 res.status(401).json({ errorsMessages: [{ field: 'password and login', message: 'password or login is wrong' }] });
-    //                 return;
-    //             }
-    //         }
-    // }
-    // async authPasswordRecovery() {
-    //         await this.authService.passwordRecovery(req.body.email);
-    //         res.sendStatus(204);
-    // }
-    // async authNewPassword() {
-    //         const newPassword = await this.authService.newPassword(req.body);
-    //         if (newPassword) {
-    //             res.sendStatus(204);
-    //         } else {
-    //             res.status(400).json({ errorsMessages: [{ message: "Code validation failure", field: "recoveryCode" }] });
-    //         }
+    @Post('login')
+    @HttpCode(200)
+    async authLoginUser(
+        @Body() body: LoginInputModel,
+        @Res({ passthrough: true }) res: Response,
+        @Req() req: Request,) {
+            const authUser = await this.authService.checkCredentials(body.loginOrEmail);
+            if (!authUser) {
+                throw new UnauthorizedException('User is not found')
+            }
+                const isCorrect = await this.bcryptService.comparePasswords(body.password, authUser.password);
+                if (isCorrect) {
+                    const { accessToken, refreshToken } = this.jwtService.generateToken(authUser);
+                    await this.authService.createSession(
+                        authUser.id,
+                        refreshToken,
+                        req.headers["user-agent"] || "unknown",
+                        req.ip || "unknown");
 
-    // }
+                res.cookie('refreshToken', refreshToken, { httpOnly: true, secure: true });
+                return { accessToken };
+                } else {
+                    throw new UnauthorizedException('Password or login is wrong')
+            }
+    }
+
+    @Post('password-recovery')
+    @HttpCode(204)
+    async authPasswordRecovery(@Body() body: RegistrationEmailResending) {
+        await this.authService.passwordRecovery(body.email);
+    }
+
+    @Post('new-password')
+    @HttpCode(204)
+    async authNewPassword(@Body() body: NewPasswordRecoveryInputModel) {
+        const newPassword = await this.authService.newPassword(body);
+        return newPassword;
+    }
+
+    // @Post()
     // async authRefreshToken() {
     //         const device = await this.authRepository.findSessionFromDeviceId(req.deviceId);
     //         if (!device) {
@@ -57,32 +67,29 @@ export class AuthController{
     //         res.cookie('refreshToken', refreshToken, { httpOnly: true, secure: true })
     //             .status(200).json({ accessToken });
     // }
-    // async authRegistration() {
-    //         const registrationResult = await this.authService.registerUser(req.body);
-    //         if (registrationResult) {
-    //             res.sendStatus(204);
-    //         } else {
-    //             res.sendStatus(400);
-    //             return;
-    //         }
-    // }
-    // async authRegistrationConfirmation() {
-    //         const result = await this.authService.confirmEmail(req.body.code);
-    //         if (result) {
-    //             res.sendStatus(204);
-    //         } else {
-    //             res.status(400).send({ errorsMessages: [{ field: "code", message: " Code validation failure " }] })
-    //             return;
-    //         }
-    // }
-    // async authRegistrationEmailResending() {
-    //         const emailResending = await this.authService.resendEmail(req.body.email);
-    //         if (emailResending) {
-    //             res.sendStatus(204);
-    //         } else {
-    //             res.status(400).json({ errorsMessages: [{ message: 'other error', field: 'email', }] });
-    //         }
-    // }
+
+    @Post('registration')
+    @HttpCode(204)
+    async authRegistration(@Body() body: UserInputModel) {
+        const registrationResult = await this.authService.registerUser(body);
+        return registrationResult;
+    }
+
+    @Post('registration-confirmation')
+    @HttpCode(204)
+    async authRegistrationConfirmation(@Body() body: RegistrationConfirmationCodeModel) {
+        const result = await this.authService.confirmEmail(body.code);
+        return result;
+    }
+
+    @Post('registration-email-resending')
+    @HttpCode(204)
+    async authRegistrationEmailResending(@Body() body: RegistrationEmailResending) {
+        const emailResending = await this.authService.resendEmail(body.email);
+        return emailResending;
+    }
+
+    // @Post()
     // async authLogout() {
     //         const device = await this.authRepository.findSessionFromDeviceId(req.deviceId);
     //         if (!device) {
@@ -95,10 +102,11 @@ export class AuthController{
     //             res.sendStatus(204);
     //         }
     // }
-    // async getUserInform() {
-    //         const { login, email, _id } = req.user;
-    //         const result = { login, email, userId: _id.toString() };
-    //         res.status(200).json(result!);
-    //         return;
-    // }
+
+    @Get('me')
+    async getUserInform(@Req() req: Request) {
+        const { login, email, _id } = req.user;
+        const result = { login, email, userId: _id.toString() };
+        return result;
+    }
 }
