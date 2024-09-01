@@ -1,12 +1,14 @@
-import { BadRequestException, Body, Controller, Delete, Get, HttpCode, NotFoundException, Param, Post, Query } from "@nestjs/common";
+import { BadRequestException, Body, Controller, Delete, Get, HttpCode, NotFoundException, Param, Post, Query, UseGuards } from "@nestjs/common";
 import { TypeUserPagination, UserInputModel } from "./models/input.models";
 import { PaginatorUserViewModel, UserViewModel } from "./models/output.models";
 import { IUserQueryRepository, IUserService } from "./models/interface";
 import { UserService } from "../application/user.service";
 import { UserQueryRepository } from "../repository/user.query-repository";
+import { BasicAuthGuard } from "src/infrastructure/guards/basic-auth.guard";
 
 
 @Controller('users')
+@UseGuards(BasicAuthGuard)
 export class UserController {
     constructor(
         protected userService: UserService,

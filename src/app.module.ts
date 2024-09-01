@@ -26,6 +26,23 @@ import { BlogController } from './features/blogs/api/blog.controller';
 import { PostController } from './features/posts/api/post.controller';
 import { TestingController } from './features/testing/testing.controller';
 import { TestingService } from './features/testing/testing.service';
+import { LoginIsExistConstraint } from './infrastructure/decorators/validate/login-is-exist.decorator';
+import { EmailIsExistConstraint } from './infrastructure/decorators/validate/email-is-exist.decorator';
+import { AuthService } from './features/auth/application/auth.service';
+import { AuthController } from './features/auth/api/auth.controller';
+import { SessionController } from './features/sessions/api/session.controller';
+import { AuthRepository } from './features/auth/repository/auth.repository';
+import { AuthQueryRepository } from './features/auth/repository/auth.query-repository';
+import { SessionService } from './features/sessions/application/session.service';
+import { SessionRepository } from './features/sessions/repository/session.repository';
+import { SessionQueryRepository } from './features/sessions/repository/session.query-repository';
+import { Session, SessionSchema } from './features/sessions/domain/session.entity';
+import { ApiInfo, ApiSchema } from './features/auth/domain/auth.entity';
+import { EmailService } from './infrastructure/adapters/sendEmail';
+import { JwtService } from './infrastructure/adapters/jwt.service';
+import { JwtModule } from '@nestjs/jwt';
+import { LocalStrategy } from './infrastructure/pasport-strategy/local.strategy';
+import { JwtStrategy } from './infrastructure/pasport-strategy/jwt.strategy';
 
 @Module({
   imports: [
@@ -34,10 +51,24 @@ import { TestingService } from './features/testing/testing.service';
       { name: User.name, schema: UserSchema },
       { name: Comment.name, schema: CommentSchema },
       { name: Blog.name, schema: BlogSchema },
-      { name: Post.name, schema: PostSchema }
+      { name: Post.name, schema: PostSchema },
+      { name: Session.name, schema: SessionSchema },
+      { name: ApiInfo.name, schema: ApiSchema },
     ]),
+    JwtModule.register({
+      global: true,
+      secret: SETTINGS.JWT_SECRET_KEY,
+      signOptions: { expiresIn: '60s' },
+    }),
   ],
-  controllers: [AppController, UserController, CommentController, BlogController, PostController, TestingController],
+  controllers: [AppController,
+    UserController,
+    CommentController,
+    BlogController,
+    PostController,
+    TestingController,
+    AuthController,
+    SessionController],
   providers: [
     // {
     //   provide: Types.IUserService,
@@ -45,10 +76,14 @@ import { TestingService } from './features/testing/testing.service';
     // },
     AppService,
     TestingService,
+    LocalStrategy, JwtStrategy,
+    LoginIsExistConstraint, EmailIsExistConstraint,
     UserService, UserQueryRepository, UserRepository,
-    BcryptService,
+    BcryptService, EmailService, JwtService,
     CommentService, CommentQueryRepository, CommentRepository,
     BlogService, BlogRepository, BlogQueryRepository,
-    PostService, PostRepository, PostQueryRepository],
+    PostService, PostRepository, PostQueryRepository,
+    AuthService, AuthRepository, AuthQueryRepository,
+    SessionService, SessionRepository, SessionQueryRepository],
 })
 export class AppModule {}
