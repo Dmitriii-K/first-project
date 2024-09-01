@@ -36,6 +36,9 @@ export class AuthRepository{
     async findUserByEmail(mail: string): Promise<UserDocument | null> {
         return this.userModel.findOne({ email: mail });
     }
+    async findOne(login: string): Promise<UserDocument | null> {
+        return this.userModel.findOne({ login: login });
+    }
     async updateConfirmation(_id: string) {
         const result = await this.userModel.updateOne({ _id }, { $set: { 'emailConfirmation.isConfirmed': true } });
         return result.modifiedCount === 1;

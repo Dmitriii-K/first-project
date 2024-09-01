@@ -28,6 +28,12 @@ export class UserRepository /*implements IUserRepository*/{
         }
         return user
     }
+    async loginUsExist (login: string): Promise<boolean> {
+        return !!(await this.userModel.countDocuments({login: login}));
+    }
+    async emailIsExist (email: string): Promise<boolean> {
+        return !!(await this.userModel.countDocuments({email: email}));
+    }
     async findUserByLogiOrEmail(data: { login: string, email: string }): Promise<User | null> {
         return this.userModel.findOne({ $or: [{ login: data.login }, { email: data.email }] });
     }

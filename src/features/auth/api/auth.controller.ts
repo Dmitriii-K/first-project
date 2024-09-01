@@ -1,4 +1,4 @@
-import { BadRequestException, Body, Controller, Get, HttpCode, Post, Req, Res, UnauthorizedException } from "@nestjs/common";
+import { BadRequestException, Body, Controller, Get, HttpCode, Post, Req, Res, UnauthorizedException, UseGuards } from "@nestjs/common";
 import { AuthService } from "../application/auth.service";
 import { AuthRepository } from "../repository/auth.repository";
 import { BcryptService } from "src/infrastructure/adapters/bcrypt";
@@ -6,6 +6,8 @@ import { JwtService } from "src/infrastructure/adapters/jwt.service";
 import { LoginInputModel, NewPasswordRecoveryInputModel, RegistrationConfirmationCodeModel, RegistrationEmailResending } from "./models/input.model";
 import { UserInputModel } from "src/features/users/api/models/input.models";
 import { Request, Response } from "express";
+import { BasicAuthGuard } from "src/infrastructure/guards/basic-auth.guard";
+import { MeViewModel } from "./models/output.model";
 
 @Controller('auth')
 export class AuthController{
@@ -126,12 +128,12 @@ export class AuthController{
     // }
 
     @Get('me')
+    @UseGuards(BasicAuthGuard)
     async getUserInform(
         @Res({ passthrough: true }) res: Response,
         @Req() req: Request) {
         const { login, email, _id } = req.user;
-        const result = { login, email, userId: _id.toString() };
-        res.status(200).json(result);
-        return;
+        const result: MeViewModel = { login, email, userId: _id.toString() };
+        return result;
     }
 }
