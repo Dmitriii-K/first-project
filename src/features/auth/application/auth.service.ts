@@ -21,6 +21,7 @@ export class AuthService{
 
     async checkCredentials(loginOrEmail: string) {
         const user = await this.authRepository.findUserByLoginOrEmail(loginOrEmail);
+        console.log(user)
         if (user) {
             return user;
         } else {
