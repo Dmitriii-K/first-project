@@ -19,13 +19,14 @@ export class AuthController{
         protected jwtService: JwtService
     ) {}
 
-    @UseGuards(LocalAuthGuard)
+    // @UseGuards(LocalAuthGuard)
     @Post('login')
     @HttpCode(200)
     async authLoginUser(
         @Body() body: LoginInputModel,
         @Res({ passthrough: true }) res: Response,
         @Req() req: Request,) {
+            console.log(body.loginOrEmail)
             const authUser = await this.authService.checkCredentials(body.loginOrEmail); // проверка реализоана в Local Strategy
             if (!authUser) {
                 throw new UnauthorizedException('User is not found')

@@ -53,6 +53,11 @@ export class User {
         user.password = password;
         user.email = email;
         user.createdAt = new Date();
+        user.emailConfirmation = {
+            confirmationCode: '',
+            expirationDate: '',
+            isConfirmed: false
+        };
         return user;
     }
 
