@@ -13,6 +13,8 @@ PATH: {
     SECURITY: "/security"
 },
 ADMIN: process.env.ADMIN || "",
+ADMIN_NAME: process.env.ADMIN_NAME || "",
+ADMIN_PASS: process.env.ADMIN_PASS || "",
 MONGO_URL: process.env.MONGO_URL || "mongodb://0.0.0.0:27017",
 BLOG_COLLECTION_NAME: process.env.BLOG_COLLECTION_NAME || "",
 POST_COLLECTION_NAME: process.env.POST_COLLECTION_NAME || "",

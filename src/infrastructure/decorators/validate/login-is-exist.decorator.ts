@@ -14,7 +14,7 @@ import { UserRepository } from 'src/features/users/repository/user.repository';
 export class LoginIsExistConstraint implements ValidatorConstraintInterface {
     constructor(private readonly usersRepository: UserRepository) { }
     async validate(value: any, args: ValidationArguments) {
-    const loginIsExist = await this.usersRepository.loginUsExist(value);
+    const loginIsExist = await this.usersRepository.loginIsExist(value);
     return !loginIsExist;
 }
 

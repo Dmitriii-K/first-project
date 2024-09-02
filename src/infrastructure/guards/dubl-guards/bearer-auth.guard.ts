@@ -2,7 +2,7 @@ import {CanActivate, ExecutionContext, Injectable, UnauthorizedException} from '
 import { Observable } from 'rxjs';
 import {Request} from "express";
 import { UserRepository } from 'src/features/users/repository/user.repository';
-import { JwtService } from '../adapters/jwt.service';
+import { JwtService } from 'src/infrastructure/adapters/jwt.service';
 
 @Injectable()
 export class BearerAuthGuard implements CanActivate {

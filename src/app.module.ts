@@ -43,6 +43,11 @@ import { JwtService } from './infrastructure/adapters/jwt.service';
 import { JwtModule } from '@nestjs/jwt';
 import { LocalStrategy } from './infrastructure/pasport-strategy/local.strategy';
 import { JwtStrategy } from './infrastructure/pasport-strategy/jwt.strategy';
+import { LocalAuthGuard } from './infrastructure/guards/local-auth.guard';
+import { JwtAuthGuard } from './infrastructure/guards/jwt-auth.guard';
+import { BasicStrategy } from './infrastructure/pasport-strategy/basic.strategy';
+import { PassportModule } from '@nestjs/passport';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
   imports: [
@@ -58,8 +63,10 @@ import { JwtStrategy } from './infrastructure/pasport-strategy/jwt.strategy';
     JwtModule.register({
       global: true,
       secret: SETTINGS.JWT_SECRET_KEY,
-      signOptions: { expiresIn: '60s' },
+      signOptions: { expiresIn: '6m' },
     }),
+    PassportModule,
+    ConfigModule.forRoot()
   ],
   controllers: [AppController,
     UserController,
@@ -76,7 +83,8 @@ import { JwtStrategy } from './infrastructure/pasport-strategy/jwt.strategy';
     // },
     AppService,
     TestingService,
-    LocalStrategy, JwtStrategy,
+    LocalStrategy, JwtStrategy, BasicStrategy,
+    LocalAuthGuard, JwtAuthGuard,// нужно ли регать?
     LoginIsExistConstraint, EmailIsExistConstraint,
     UserService, UserQueryRepository, UserRepository,
     BcryptService, EmailService, JwtService,

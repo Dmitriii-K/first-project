@@ -10,13 +10,16 @@ async function bootstrap() {
   app.enableCors();
   app.useGlobalPipes(new ValidationPipe({
     transform: true,
-    stopAtFirstError: true,
+    stopAtFirstError: false,
     forbidUnknownValues: false,
     exceptionFactory: (errors) => {
-      const errorsForResponse: OutputErrorsType = [];
+      // @ts-ignore
+      const errorsForResponse: OutputErrorsType = { errorsMessages: [] };
       errors.forEach((e) => {
+        // @ts-ignore
         const constraintsKey = Object.keys(e.constraints);
         constraintsKey.forEach((ckey) => {
+          // @ts-ignore
           errorsForResponse.errorsMessages.push({ message: e.constraints[ckey], field: e.property });
         });
       });

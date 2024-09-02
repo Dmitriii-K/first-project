@@ -6,8 +6,9 @@ import { JwtService } from "src/infrastructure/adapters/jwt.service";
 import { LoginInputModel, NewPasswordRecoveryInputModel, RegistrationConfirmationCodeModel, RegistrationEmailResending } from "./models/input.model";
 import { UserInputModel } from "src/features/users/api/models/input.models";
 import { Request, Response } from "express";
-import { BasicAuthGuard } from "src/infrastructure/guards/basic-auth.guard";
 import { MeViewModel } from "./models/output.model";
+import { LocalAuthGuard } from "src/infrastructure/guards/local-auth.guard";
+import { JwtAuthGuard } from "src/infrastructure/guards/jwt-auth.guard";
 
 @Controller('auth')
 export class AuthController{
@@ -18,13 +19,14 @@ export class AuthController{
         protected jwtService: JwtService
     ) {}
 
+    @UseGuards(LocalAuthGuard)
     @Post('login')
     @HttpCode(200)
     async authLoginUser(
         @Body() body: LoginInputModel,
         @Res({ passthrough: true }) res: Response,
         @Req() req: Request,) {
-            const authUser = await this.authService.checkCredentials(body.loginOrEmail);
+            const authUser = await this.authService.checkCredentials(body.loginOrEmail); // проверка реализоана в Local Strategy
             if (!authUser) {
                 throw new UnauthorizedException('User is not found')
                 // res.status(401).json({ errorsMessages: [{ field: 'user', message: 'user not found' }] });
@@ -127,13 +129,14 @@ export class AuthController{
     //         }
     // }
 
+    @UseGuards(JwtAuthGuard)
     @Get('me')
-    @UseGuards(BasicAuthGuard)
     async getUserInform(
-        @Res({ passthrough: true }) res: Response,
-        @Req() req: Request) {
-        const { login, email, _id } = req.user;
-        const result: MeViewModel = { login, email, userId: _id.toString() };
+        @Res({ passthrough: true }) response: Response,
+        @Req() request: Request) {
+            if(!request.user) throw new UnauthorizedException()
+        const { login, email, userId } = request.userGlobal;
+        const result: MeViewModel = { login, email, userId };
         return result;
     }
 }

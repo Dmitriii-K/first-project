@@ -8,6 +8,7 @@ import { User, UserDocument } from "src/features/users/domain/user.entity";
 import { randomUUID } from "crypto";
 import { NewPasswordRecoveryInputModel } from "../api/models/input.model";
 import { UserInputModel } from "src/features/users/api/models/input.models";
+import { UserFromAuth } from "src/infrastructure/pasport-strategy/local.strategy";
 
 @Injectable()
 export class AuthService{
@@ -164,7 +165,7 @@ export class AuthService{
         ]);
         return true;
     }
-    async validateUser(login: string, pass: string): Promise<any> {
+    async validateUser(login: string, pass: string): Promise<any | null> {
         const user = await this.authRepository.findOne(login);
         if (user && user.password === pass) {
             const { password, ...result } = user;
