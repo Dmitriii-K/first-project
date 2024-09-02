@@ -28,7 +28,7 @@ export class UserRepository /*implements IUserRepository*/{
         }
         return user
     }
-    async loginUsExist (login: string): Promise<boolean> {
+    async loginIsExist (login: string): Promise<boolean> {
         return !!(await this.userModel.countDocuments({login: login}));
     }
     async emailIsExist (email: string): Promise<boolean> {

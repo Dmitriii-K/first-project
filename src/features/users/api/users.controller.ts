@@ -4,11 +4,11 @@ import { PaginatorUserViewModel, UserViewModel } from "./models/output.models";
 import { IUserQueryRepository, IUserService } from "./models/interface";
 import { UserService } from "../application/user.service";
 import { UserQueryRepository } from "../repository/user.query-repository";
-import { BasicAuthGuard } from "src/infrastructure/guards/basic-auth.guard";
+import { BasicAuthGuard } from "src/infrastructure/guards/basic.guard";
+import { BasicGuard } from "src/infrastructure/guards/dubl-guards/basic-auth.guard";
 
-
+@UseGuards(BasicGuard)
 @Controller('users')
-@UseGuards(BasicAuthGuard)
 export class UserController {
     constructor(
         protected userService: UserService,

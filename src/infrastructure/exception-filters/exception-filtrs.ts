@@ -4,6 +4,7 @@ import {
     HttpException,
     HttpStatus
 } from '@nestjs/common';
+import { error } from 'console';
 import { Request, Response } from 'express';
 import { OutputErrorsType } from 'src/base/types/output-errors.types';
 
@@ -17,24 +18,28 @@ import { OutputErrorsType } from 'src/base/types/output-errors.types';
         const status = exception.getStatus();
 
     if (status === HttpStatus.BAD_REQUEST) {
-        const errorsResponse: OutputErrorsType = {
-        errorsMessages: [],
-        };
+        const errorsResponse: OutputErrorsType = { errorsMessages: [] };
         const responseBody: any = exception.getResponse();
-        responseBody.message.forEach((m) => errorsResponse.errorsMessages.push(m));
-        // if (Array.isArray(responseBody.message)) {
-        //     responseBody.message.forEach((e) =>
-        //     errorsResponse.errorsMessages.push(e));
-        // } else {
-        //     errorsResponse.errorsMessages.push(responseBody.message);
-        // }
-        response.status(status).json(errorsResponse);
-    } else {
+
+        // responseBody.message.forEach((m) => errorsResponse.errorsMessages.push(m));
+        if (Array.isArray(responseBody.message)) {
+            responseBody.message.forEach((e) =>
+            errorsResponse.errorsMessages.push(e));
+        } else {
+            errorsResponse.errorsMessages.push(responseBody);
+        }
+        return response.status(status).send(error);
+    }
+    if(status === HttpStatus.UNAUTHORIZED) {
+        return response.sendStatus(401)
+    }
+    if(status === 429) {
+        return response.sendStatus(429)
+    }
         response.status(status).json({
         statusCode: status,
         timestamp: new Date().toISOString(),
         path: request.url,
         });
-    }
     }
 }
