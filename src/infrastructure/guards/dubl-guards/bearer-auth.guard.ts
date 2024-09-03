@@ -10,9 +10,9 @@ export class BearerAuthGuard implements CanActivate {
         protected userRepository: UserRepository,
         protected jwtService: JwtService,) {}
 
-    canActivate(
+    async canActivate(
     context: ExecutionContext,
-    ): boolean | Promise<boolean> | Observable<boolean> {
+    ): Promise<boolean> {
     const request = context.switchToHttp().getRequest<Request>();
 
     if(!request.headers.authorization) {
@@ -23,9 +23,10 @@ export class BearerAuthGuard implements CanActivate {
     if(!payload) {
         throw new UnauthorizedException();
     }
-    const user = this.userRepository.findUserByMiddleware(payload.userId)
+    const user = await this.userRepository.findUserByMiddleware(payload.userId)
+
     if(user) {
-    request.user = user;
+        request.user = {email: user.email, login: user.login, userId: user._id.toString()};
     } else {
         throw new UnauthorizedException();
     }

@@ -8,7 +8,7 @@ import { UserController } from './features/users/api/users.controller';
 import { UserService } from './features/users/application/user.service';
 import { BcryptService } from './infrastructure/adapters/bcrypt';
 import { UserRepository } from './features/users/repository/user.repository';
-import { SETTINGS } from './settings/app-settings';
+import { configFactory, SETTINGS } from './settings/app-settings';
 import { CommentController } from './features/comments/api/comment.controller';
 import { CommentQueryRepository } from './features/comments/repository/comment.query-repository';
 import { CommentRepository } from './features/comments/repository/comment.repository';
@@ -48,6 +48,10 @@ import { JwtAuthGuard } from './infrastructure/guards/jwt-auth.guard';
 import { BasicStrategy } from './infrastructure/pasport-strategy/basic.strategy';
 import { PassportModule } from '@nestjs/passport';
 import { ConfigModule } from '@nestjs/config';
+import { SETTINGSFUNCTION } from './settings/app-setting-function';
+import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
+import { APP_GUARD } from '@nestjs/core';
+
 
 @Module({
   imports: [
@@ -65,8 +69,15 @@ import { ConfigModule } from '@nestjs/config';
       secret: SETTINGS.JWT_SECRET_KEY,
       signOptions: { expiresIn: '6m' },
     }),
+    ThrottlerModule.forRoot([{
+      ttl: 10000,
+      limit: 5,
+    }]),
     PassportModule,
-    ConfigModule.forRoot()
+    ConfigModule.forRoot({
+      isGlobal: true,
+      load: [configFactory],
+  })
   ],
   controllers: [AppController,
     UserController,
@@ -84,7 +95,6 @@ import { ConfigModule } from '@nestjs/config';
     AppService,
     TestingService,
     LocalStrategy, JwtStrategy, BasicStrategy,
-    LocalAuthGuard, JwtAuthGuard,// нужно ли регать?
     LoginIsExistConstraint, EmailIsExistConstraint,
     UserService, UserQueryRepository, UserRepository,
     BcryptService, EmailService, JwtService,

@@ -26,3 +26,8 @@ LIKES_COLLECTION_NAME: process.env.LIKES_COLLECTION_NAME || "",
 JWT_SECRET_KEY: process.env.JWT_SECRET_KEY || "",
 PASSWORD_BY_EMAIL: process.env.PASSWORD_BY_EMAIL || ""
 };
+
+export const configFactory = () => ({
+    ADMIN_NAME: "admin",
+    ADMIN_PASS: "qwerty",
+});

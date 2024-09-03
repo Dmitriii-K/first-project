@@ -3,25 +3,27 @@ import { PassportStrategy } from '@nestjs/passport';
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { AuthService } from 'src/features/auth/application/auth.service';
 import { UserDocument } from 'src/features/users/domain/user.entity';
+import { log } from 'console';
+import { BcryptService } from '../adapters/bcrypt';
 
-export class UserFromAuth {
-    user: {
-    email: string
-    login: string
-    userId:string}
-}
 
 @Injectable()
 export class LocalStrategy extends PassportStrategy(Strategy) {
-    constructor(private authService: AuthService) {
-    super({ usernameField: 'login' });
+    constructor(
+        private authService: AuthService,
+        private bcryptService: BcryptService,
+    ) {
+    super({ usernameField: 'loginOrEmail',passwordField: "password" });
 }
-
-    async validate(login: string, password: string): Promise<UserFromAuth> {
-    const user = await this.authService.validateUser(login, password);
+    async validate(loginOrEmail: string, password: string) {
+    const user = await this.authService.validateUser(loginOrEmail, password);
     if (!user) {
-        throw new UnauthorizedException();
+        throw new UnauthorizedException('User is not found');
     }
-    return { user:{email: user.email, login: user.login, userId: user._id} };
+    const isCorrect = await this.bcryptService.comparePasswords(password, user.password);
+    if (!isCorrect) {
+        throw new UnauthorizedException('Password or login is wrong');
+    }
+    return {email: user.email, login: user.login, userId: user._id.toString()};
     }
 }

@@ -9,7 +9,10 @@ import { Request, Response } from "express";
 import { MeViewModel } from "./models/output.model";
 import { LocalAuthGuard } from "src/infrastructure/guards/local-auth.guard";
 import { JwtAuthGuard } from "src/infrastructure/guards/jwt-auth.guard";
+import { SkipThrottle, Throttle, ThrottlerGuard } from "@nestjs/throttler";
+import { BearerAuthGuard } from "src/infrastructure/guards/dubl-guards/bearer-auth.guard";
 
+@UseGuards(ThrottlerGuard)
 @Controller('auth')
 export class AuthController{
     constructor(
@@ -19,41 +22,23 @@ export class AuthController{
         protected jwtService: JwtService
     ) {}
 
-    // @UseGuards(LocalAuthGuard)
+    @UseGuards(LocalAuthGuard)
+    @SkipThrottle()
     @Post('login')
     @HttpCode(200)
     async authLoginUser(
         @Body() body: LoginInputModel,
         @Res({ passthrough: true }) res: Response,
         @Req() req: Request,) {
-            console.log(body.loginOrEmail)
-            const authUser = await this.authService.checkCredentials(body.loginOrEmail); // проверка реализоана в Local Strategy
-            if (!authUser) {
-                throw new UnauthorizedException('User is not found')
-                // res.status(401).json({ errorsMessages: [{ field: 'user', message: 'user not found' }] });
-                // return;
-            }
-                const isCorrect = await this.bcryptService.comparePasswords(body.password, authUser.password);
-                if (isCorrect) {
-                    const { accessToken, refreshToken } = this.jwtService.generateToken(authUser);
-                    await this.authService.createSession(
-                        authUser.id,
-                        refreshToken,
-                        req.headers["user-agent"] || "unknown",
-                        req.ip || "unknown");
+            const { accessToken, refreshToken } = this.jwtService.generateToken(req.user!);
+            await this.authService.createSession(
+                req.user!.userId,
+                refreshToken,
+                req.headers["user-agent"] || "unknown",
+                req.ip || "unknown");
 
-                res.cookie('refreshToken', refreshToken, { httpOnly: true, secure: true });
-                return { accessToken };
-                } else {
-                    throw new UnauthorizedException('Password or login is wrong')
-            }
-            // res.cookie('refreshToken', refreshToken, { httpOnly: true, secure: true })
-            //     .status(200).json({ accessToken });
-            //     return;
-            // } else {
-            //     res.status(401).json({ errorsMessages: [{ field: 'password and login', message: 'password or login is wrong' }] });
-            //     return;
-            //     }
+        res.cookie('refreshToken', refreshToken, { httpOnly: true, secure: true });
+        return { accessToken };
     }
 
     @Post('password-recovery')
@@ -130,13 +115,15 @@ export class AuthController{
     //         }
     // }
 
+    @SkipThrottle()
     @UseGuards(JwtAuthGuard)
     @Get('me')
     async getUserInform(
         @Res({ passthrough: true }) response: Response,
         @Req() request: Request) {
             if(!request.user) throw new UnauthorizedException()
-        const { login, email, userId } = request.userGlobal;
+        const {login, email, userId} = request.user // as { login: string, email: string, userId: string }
+
         const result: MeViewModel = { login, email, userId };
         return result;
     }

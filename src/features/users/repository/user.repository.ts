@@ -2,6 +2,7 @@ import { Injectable } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import { User, UserDocument, UserModelType } from "../domain/user.entity";
 import { IUserRepository } from "../api/models/interface";
+import {WithId} from "mongodb"
 
 @Injectable()
 export class UserRepository /*implements IUserRepository*/{
@@ -21,7 +22,7 @@ export class UserRepository /*implements IUserRepository*/{
         }
         return user;
     }
-    async findUserByMiddleware (id: string) {
+    async findUserByMiddleware (id: string) : Promise<WithId<User> | null>{
         const user = await this.userModel.findOne({_id: id});
         if (!user) {
             return null;

@@ -7,7 +7,7 @@ import { UserQueryRepository } from "../repository/user.query-repository";
 import { BasicAuthGuard } from "src/infrastructure/guards/basic.guard";
 import { BasicGuard } from "src/infrastructure/guards/dubl-guards/basic-auth.guard";
 
-@UseGuards(BasicGuard)
+@UseGuards(BasicAuthGuard)
 @Controller('users')
 export class UserController {
     constructor(

@@ -8,7 +8,7 @@ import { User, UserDocument } from "src/features/users/domain/user.entity";
 import { randomUUID } from "crypto";
 import { NewPasswordRecoveryInputModel } from "../api/models/input.model";
 import { UserInputModel } from "src/features/users/api/models/input.models";
-import { UserFromAuth } from "src/infrastructure/pasport-strategy/local.strategy";
+import {WithId} from "mongodb"
 
 @Injectable()
 export class AuthService{
@@ -21,7 +21,6 @@ export class AuthService{
 
     async checkCredentials(loginOrEmail: string) {
         const user = await this.authRepository.findUserByLoginOrEmail(loginOrEmail);
-        console.log(user)
         if (user) {
             return user;
         } else {
@@ -166,12 +165,8 @@ export class AuthService{
         ]);
         return true;
     }
-    async validateUser(login: string, pass: string): Promise<any | null> {
-        const user = await this.authRepository.findOne(login);
-        if (user && user.password === pass) {
-            const { password, ...result } = user;
-            return result;
-        }
-        return null;
+    async validateUser(login: string, pass: string): Promise<WithId<User> | null> {
+        console.log(login)
+        return this.authRepository.findOne(login);
     }
 }

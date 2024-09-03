@@ -18,7 +18,7 @@ export class UserInputModel {
     @IsNotEmpty()
     @Length(3,10)
     @Matches(/^[a-zA-Z0-9_-]*$/)
-    // @LoginIsExist()// в идеале проверять в BLL
+    @LoginIsExist()// в идеале проверять в BLL
     login: string;
 
     @IsString()
@@ -32,6 +32,6 @@ export class UserInputModel {
     @IsNotEmpty()
     @Matches(/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/)
     @IsEmail()
-    // @EmailIsExist()// в идеале проверять в BLL
+    @EmailIsExist()// в идеале проверять в BLL
     email: string;
 }

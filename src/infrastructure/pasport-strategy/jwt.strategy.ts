@@ -2,8 +2,8 @@ import { ExtractJwt, Strategy } from 'passport-jwt';
 import { PassportStrategy } from '@nestjs/passport';
 import { Injectable } from '@nestjs/common';
 import { SETTINGS } from 'src/settings/app-settings';
-import { UserFromAuth } from './local.strategy';
 import { UserDocument } from 'src/features/users/domain/user.entity';
+import { RequestUserDTO } from 'src/features/auth/api/models/input.model';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
@@ -11,15 +11,15 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     super({
         jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
         ignoreExpiration: false,
-        secretOrKey: SETTINGS.JWT_SECRET_KEY,
+        secretOrKey: "123",
     });
 }
 
-    async validate(payload: any):Promise<UserFromAuth | boolean> {
+    async validate(payload: any): Promise<RequestUserDTO | boolean> {
     // return { userId: payload.sub, username: payload.username };
-    if(!payload.email || !payload.login || !payload.sub) {
+    if(!payload.email || !payload.login || !payload.userId) {
         return false
     }
-    return { user:{email: payload.email, login: payload.login, userId: payload._id} };
+    return {email: payload.email, login: payload.login, userId: payload.userId};
     }
 }
