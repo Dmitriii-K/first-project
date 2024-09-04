@@ -1,13 +1,13 @@
 import * as express from 'express'
 
+
+
 declare global {
     namespace Express {
-    export interface Request {
-        userGlobal: {
-            email: string
-            login: string
-            userId:string}
-    }
+        class User { login: string; email: string; userId: string}
+        export interface Request {
+            user?: User
+        }
     }
 }
 

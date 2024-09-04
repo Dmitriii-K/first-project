@@ -18,7 +18,7 @@ import { OutputErrorsType } from 'src/base/types/output-errors.types';
         const status = exception.getStatus();
 
     if (status === HttpStatus.BAD_REQUEST) {
-        const errorsResponse: OutputErrorsType = { errorsMessages: [] };
+        const errorsResponse = new OutputErrorsType();
         const responseBody: any = exception.getResponse();
 
         // responseBody.message.forEach((m) => errorsResponse.errorsMessages.push(m));
@@ -28,7 +28,7 @@ import { OutputErrorsType } from 'src/base/types/output-errors.types';
         } else {
             errorsResponse.errorsMessages.push(responseBody);
         }
-        return response.status(status).send(error);
+        return response.status(status).send(errorsResponse);
     }
     if(status === HttpStatus.UNAUTHORIZED) {
         return response.sendStatus(401)

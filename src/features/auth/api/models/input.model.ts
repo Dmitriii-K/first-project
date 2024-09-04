@@ -1,6 +1,7 @@
 import { IsEmail, IsNotEmpty, IsString, Length, Matches } from "class-validator";
 import { Trim } from "src/infrastructure/decorators/transform/trim";
 
+
 export class LoginInputModel {
     @IsString()
     @Trim()
@@ -40,4 +41,9 @@ export class RegistrationConfirmationCodeModel {
     @Trim()
     @IsNotEmpty()
     code: string;
+}
+export interface RequestUserDTO  {
+    login: string,
+    email: string,
+    userId: string
 }

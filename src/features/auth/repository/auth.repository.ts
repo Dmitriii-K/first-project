@@ -3,7 +3,7 @@ import { InjectModel } from "@nestjs/mongoose";
 import { ApiInfo, ApiInfoModelType } from "../domain/auth.entity";
 import { User, UserDocument, UserModelType } from "src/features/users/domain/user.entity";
 import { Session, SessionModelType } from "src/features/sessions/domain/session.entity";
-import { UserFromAuth } from "src/infrastructure/pasport-strategy/local.strategy";
+
 
 @Injectable()
 export class AuthRepository{
@@ -25,7 +25,7 @@ export class AuthRepository{
         return this.userModel.findOne({ $or: [{ login: login }, { email: email }] });
     }
     async findUserByLoginOrEmail(loginOrEmail: string): Promise<UserDocument | null> {
-        return this.apiModel.findOne({ $or: [{ login: loginOrEmail }, { email: loginOrEmail }] });
+        return this.userModel.findOne({ $or: [{ login: loginOrEmail }, { email: loginOrEmail }] });
     }
     async createUser(user: User) {
         const saveResult = await this.userModel.create(user);

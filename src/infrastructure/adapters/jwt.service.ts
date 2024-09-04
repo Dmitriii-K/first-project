@@ -3,7 +3,8 @@ import { SETTINGS } from '../../settings/app-settings';
 import {  WithId } from 'mongodb';
 import { randomUUID } from 'crypto';
 import { Injectable } from '@nestjs/common';
-import { User, UserDocument } from 'src/features/users/domain/user.entity';
+import { RequestUserDTO } from 'src/features/auth/api/models/input.model';
+
 
 
 export type PayloadType  = {
@@ -22,9 +23,9 @@ export type UnionPayload = PayloadType & SystemPayload
 
 @Injectable()
 export class JwtService /*implements IJwtService*/ {
-generateToken(user: UserDocument, deviceId?: string): { accessToken: string, refreshToken: string } {
+generateToken(user: RequestUserDTO, deviceId?: string): { accessToken: string, refreshToken: string } {
     const payload: PayloadType = {
-        userId: user.id,
+        userId: user.userId,
         email: user.email,
         login: user.login,
         deviceId: deviceId ?? randomUUID()
@@ -35,7 +36,7 @@ generateToken(user: UserDocument, deviceId?: string): { accessToken: string, ref
     const optionsRefreshToken = {
         expiresIn: '8000s'
     };
-    const secretKey = SETTINGS.JWT_SECRET_KEY;
+    const secretKey = "123";
     const accessToken: string = jwt.sign(payload, secretKey, optionsAccessToken);
     const refreshToken: string = jwt.sign(payload, secretKey, optionsRefreshToken);
     return { accessToken, refreshToken };
