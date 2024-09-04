@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common";
+import { BadRequestException, Injectable } from "@nestjs/common";
 import { AuthRepository } from "../repository/auth.repository";
 import { BcryptService } from "src/infrastructure/adapters/bcrypt";
 import { JwtService } from "src/infrastructure/adapters/jwt.service";
@@ -138,7 +138,9 @@ export class AuthService{
     async passwordRecovery(mail: string): Promise<boolean> {
         // Проверяем, существует ли пользователь с таким email
         const user: UserDocument | null = await this.authRepository.findUserByEmail(mail);
-        if (!user) return false; // Пользователь не найден
+        if (!user) {
+            throw new BadRequestException();
+        } // Пользователь не найден
         // Генерируем код восстановления
         const recoveryCode = randomUUID();
         await this.authRepository.updateCode(user.id, recoveryCode);
@@ -147,17 +149,29 @@ export class AuthService{
     }
     async confirmEmail(code: string) {
         const user: UserDocument | null = await this.authRepository.findUserByCode(code);
-        if (!user) return false;
-        if (user.emailConfirmation.isConfirmed) return false;
-        if (user.emailConfirmation.confirmationCode !== code) return false;
-        if (user.emailConfirmation.expirationDate < new Date().toISOString()) return false;
+        if (!user) {
+            throw new BadRequestException({ errorsMessages: { message: "This code is incorrect", field: "code" } });
+        }
+        if (user.emailConfirmation.isConfirmed) {
+            throw new BadRequestException({ errorsMessages: { message: "This field is verified", field: "code" } });
+        }
+        if (user.emailConfirmation.confirmationCode !== code) {
+            throw new BadRequestException({ errorsMessages: { message: "This code is incorrect", field: "code" } });
+        }
+        if (user.emailConfirmation.expirationDate < new Date().toISOString()) {
+            throw new BadRequestException({ errorsMessages: { message: "Expiration date is over", field: "code" } });
+        }
         const result = await this.authRepository.updateConfirmation(user.id);
         return result;
     }
     async resendEmail(mail: string) {
         const user: UserDocument | null = await this.authRepository.findUserByEmail(mail);
-        if (!user) return false;
-        if (user.emailConfirmation.isConfirmed) return false;
+        if (!user) {
+            throw new BadRequestException({ errorsMessages: { message: "This email is incorrect", field: "email" } });
+        }
+        if (user.emailConfirmation.isConfirmed) {
+            throw new BadRequestException({ errorsMessages: { message: "This field is verified", field: "email" } });
+        }
         const newCode = randomUUID();
         await Promise.all([
             this.authRepository.updateCode(user.id, newCode),

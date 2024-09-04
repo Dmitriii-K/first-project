@@ -13,7 +13,7 @@ async function bootstrap() {
   useContainer(app.select(AppModule), { fallbackOnErrors: true });
   app.useGlobalPipes(new ValidationPipe({
     transform: true,
-    stopAtFirstError: false,
+    stopAtFirstError: true,
     forbidUnknownValues: false,
     exceptionFactory: (errors) => {
       const errorsForResponse:  { message: string, field: string }[]  = [] ;

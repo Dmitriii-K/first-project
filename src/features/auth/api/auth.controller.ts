@@ -52,7 +52,7 @@ export class AuthController{
     async authNewPassword(@Body() body: NewPasswordRecoveryInputModel) {
         const newPassword = await this.authService.newPassword(body);
         if(!newPassword) {
-            throw new BadRequestException('This is a bad request error is recovery code');
+            throw new BadRequestException();
         }
         return newPassword;
     }
@@ -76,7 +76,7 @@ export class AuthController{
     async authRegistration(@Body() body: UserInputModel) {
         const registrationResult = await this.authService.registerUser(body);
         if(!registrationResult) {
-            throw new BadRequestException('This is a bad request error is registration');
+            throw new BadRequestException();
         }
         return registrationResult;
     }
@@ -86,7 +86,7 @@ export class AuthController{
     async authRegistrationConfirmation(@Body() body: RegistrationConfirmationCodeModel) {
         const result = await this.authService.confirmEmail(body.code);
         if(!result) {
-            throw new BadRequestException('Error is Code validation failure');
+            throw new BadRequestException();
         }
         return result;
     }
@@ -96,7 +96,7 @@ export class AuthController{
     async authRegistrationEmailResending(@Body() body: RegistrationEmailResending) {
         const emailResending = await this.authService.resendEmail(body.email);
         if(!emailResending) {
-            throw new BadRequestException('This is a bad request error is email');
+            throw new BadRequestException();
         }
         return emailResending;
     }
