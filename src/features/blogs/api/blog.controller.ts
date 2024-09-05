@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, HttpCode, NotFoundException, Param, Post, Put, Query } from "@nestjs/common";
+import { Body, Controller, Delete, Get, HttpCode, NotFoundException, Param, Post, Put, Query, Req, Res, UseGuards } from "@nestjs/common";
 import { BlogService } from "../application/blog.service";
 import { BlogQueryRepository } from "../repository/blog.query-repository";
 import { TypeBlogHalper, TypePostForBlogHalper } from "src/base/types/blog.types";
@@ -6,6 +6,8 @@ import { PaginatorBlogViewModel } from "./models/output.model";
 import { BlogInputModel, BlogPostInputModel } from "./models/input.model";
 import { BlogRepository } from "../repository/blog.repository";
 import { BlogExistsPipe } from "src/infrastructure/pipes/blogExists.pipe";
+import { Request, Response } from "express";
+import { BasicAuthGuard } from "src/infrastructure/guards/basic.guard";
 
 
 @Controller('blogs')
@@ -21,7 +23,9 @@ export class BlogController {
         const blogs: PaginatorBlogViewModel = await this.blogQueryRepository.getAllBlogs(query);
         return blogs;
     }
+
     @Post()
+    @UseGuards(BasicAuthGuard)
     async createBlog(@Body() body: BlogInputModel) {
         const createResult = await this.blogService.createBlog(body);
         if (!createResult) {
@@ -30,15 +34,20 @@ export class BlogController {
         const newBlog = await this.blogQueryRepository.getBlogById(createResult);
         return newBlog;
     }
+
     @Get(':id/posts')
     async getPostForBlog(
         @Query() query: TypePostForBlogHalper,
-        @Param('id', BlogExistsPipe) id: string) {
-            // const userId: string | null = req.user ? req.user._id.toString() : null;
+        @Param('id', BlogExistsPipe) id: string,
+        @Res({ passthrough: true }) res: Response,
+        @Req() req: Request) {
+            const userId: string | null = req.user ? req.user.userId : null;
             
-            return await this.blogQueryRepository.getPostFofBlog(query, id/*, userId*/);
+            return await this.blogQueryRepository.getPostFofBlog(query, id, userId);
     }
+
     @Post(':id/posts')
+    @UseGuards(BasicAuthGuard)
     async createPostForBlog(
         @Param('id') id: string,
         @Body() body: BlogPostInputModel) {
@@ -50,6 +59,7 @@ export class BlogController {
             const newPostForBlog = await this.blogQueryRepository.getPostForBlogById(createResult);
             return newPostForBlog;
     }
+
     @Get(':id')
     async getBlogById(@Param('id') id: string) {
         const blogResult = await this.blogQueryRepository.getBlogById(id);
@@ -58,7 +68,9 @@ export class BlogController {
         }
         return blogResult;
     }
+
     @Put(':id')
+    @UseGuards(BasicAuthGuard)
     @HttpCode(204)
     async updateBlog(
         @Param('id') id: string,
@@ -70,7 +82,9 @@ export class BlogController {
             const updateBlogResult = await this.blogService.updateBlog(id, body);
             return updateBlogResult;
     }
+
     @Delete(':id')
+    @UseGuards(BasicAuthGuard)
     @HttpCode(204)
     async deleteBlog(@Param('id') id: string) {
         const deleteResult = await this.blogService.deleteBlog(id);

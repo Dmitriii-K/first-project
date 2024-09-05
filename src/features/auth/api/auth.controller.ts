@@ -29,7 +29,7 @@ export class AuthController{
     async authLoginUser(
         @Body() body: LoginInputModel,
         @Res({ passthrough: true }) res: Response,
-        @Req() req: Request,) {
+        @Req() req: Request) {
             const { accessToken, refreshToken } = this.jwtService.generateToken(req.user!);
             await this.authService.createSession(
                 req.user!.userId,

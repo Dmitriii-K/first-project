@@ -8,7 +8,7 @@ export class LikesType {
     addedAt: string;
     commentId: string;
     userId: string;
-    userIogin: string;
+    userLogin: string;
     status: likeStatus
 }
 

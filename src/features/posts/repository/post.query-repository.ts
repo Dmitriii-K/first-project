@@ -3,12 +3,12 @@ import { InjectModel } from "@nestjs/mongoose";
 import { CommentRepository } from "src/features/comments/repository/comment.repository";
 import { Post, PostDocument, PostModelType } from "../domain/post.entity";
 import { Comment, CommentDocument, CommentModelType } from "src/features/comments/domain/comment.entity";
-import { likeStatus, LikesType } from "src/base/types/like.types";
 import { CommentViewModel, PaginatorCommentViewModelDB } from "src/features/comments/api/models/output.model";
 import { PaginatorPostViewModel, PostViewModel } from "../api/models/output.model";
 import { TypePostHalper } from "src/base/types/post.types";
 import { postPagination } from "src/base/models/post.model";
 import { commentsPagination } from "src/base/models/comment.model";
+import { likeStatus, LikesType, NewestLikesType } from "src/features/likes/api/models/input.model";
 
 
 @Injectable()
@@ -19,7 +19,7 @@ export class PostQueryRepository {
         @InjectModel(Comment.name) private commentModel: CommentModelType
     ) {}
 
-    async getAllPosts(helper: TypePostHalper/*, user: PostDocument | null*/): Promise<PaginatorPostViewModel> {
+    async getAllPosts(helper: TypePostHalper, user: PostDocument | null): Promise<PaginatorPostViewModel> {
         const queryParams = postPagination(helper);
         const posts: PostDocument[] = (await this.postModel
             .find({})
@@ -30,13 +30,13 @@ export class PostQueryRepository {
         const totalCount = await this.postModel.countDocuments({});
 
         const items = await Promise.all(posts.map(async post => {
-            // let like;
-            // if (user) {
-            //     like = await this.commentRepository.findLike(post._id.toString(), user._id.toString());
-            // }
-            // const allLikes = await this.commentRepository.findAllLikesForPost(post._id.toString());
-            // const userLikeStatus = like ? like.status : likeStatus.None;
-            return this.mapPost(post/*, userLikeStatus, allLikes*/);
+            let like;
+            if (user) {
+                like = await this.commentRepository.findLike(post._id.toString(), user._id.toString());
+            }
+            const allLikes = await this.commentRepository.findAllLikesForPost(post._id.toString());
+            const userLikeStatus = like ? like.status : likeStatus.None;
+            return this.mapPost(post, userLikeStatus, allLikes);
         }));
 
         return {
@@ -47,18 +47,18 @@ export class PostQueryRepository {
             items,
         };
     }
-    async findPostById(postId: string/*, userId: string | null*/) {
+    async findPostById(postId: string, userId: string | null) {
         const post = await this.postModel.findOne({ _id: postId });
         if (!post) {
             return null;
         }
-        // let like;
-        // if (userId) {
-        //     like = await this.commentRepository.findLike(postId, userId);
-        // }
-        // const allLikes = await this.commentRepository.findAllLikesForPost(post._id.toString());
-        // const userLikeStatus = like ? like.status : likeStatus.None;
-        return this.mapPost(post/*, userLikeStatus, allLikes*/);
+        let like;
+        if (userId) {
+            like = await this.commentRepository.findLike(postId, userId);
+        }
+        const allLikes = await this.commentRepository.findAllLikesForPost(post._id.toString());
+        const userLikeStatus = like ? like.status : likeStatus.None;
+        return this.mapPost(post, userLikeStatus, allLikes);
     }
     async findCommentById(commentId: string) {
         const comment = await this.commentModel.findOne({ _id: commentId });
@@ -67,7 +67,7 @@ export class PostQueryRepository {
         }
         return this.mapComment(comment);
     }
-    async findCommentByPost(helper: TypePostHalper, id: string/*, userId: string | null*/): Promise<PaginatorCommentViewModelDB> {
+    async findCommentByPost(helper: TypePostHalper, id: string, userId: string | null): Promise<PaginatorCommentViewModelDB> {
         const queryParams = commentsPagination(helper);
         const comments: CommentDocument[] = await this.commentModel
             .find({ postId: id })
@@ -79,12 +79,12 @@ export class PostQueryRepository {
         const totalCount = await this.commentModel.countDocuments({ postId: id });
 
         const items = await Promise.all(comments.map(async comment => {
-            // let like;
-            // if (userId) {
-            //     like = await this.commentRepository.findLike(comment._id.toString(), userId);
-            // }
-            // const userLikeStatus = like ? like.status : likeStatus.None;
-            return this.mapComment(comment/*, userLikeStatus*/);
+            let like;
+            if (userId) {
+                like = await this.commentRepository.findLike(comment._id.toString(), userId);
+            }
+            const userLikeStatus = like ? like.status : likeStatus.None;
+            return this.mapComment(comment, userLikeStatus);
         }));
 
         return {
@@ -95,23 +95,23 @@ export class PostQueryRepository {
             items,
         };
     }
-    mapPost(post: PostDocument/*, userLikeStatus?: likeStatus, allLikes?: LikesType[]*/): PostViewModel {
-        // const newestLikes: NewestLikesType[] = [];
+    mapPost(post: PostDocument, userLikeStatus?: likeStatus, allLikes?: LikesType[]): PostViewModel {
+        const newestLikes: NewestLikesType[] = [];
 
-        // if (allLikes) {
-        //     // Фильтруем лайки, оставляя только те, у которых статус равен "Like"
-        //     const likesOnly = allLikes.filter(like => like.status === 'Like');
-        //     // Сортируем лайки по полю addedAt в порядке убывания
-        //     likesOnly.sort((a, b) => new Date(b.addedAt).getTime() - new Date(a.addedAt).getTime());
-        //     // Ограничиваем количество лайков, если нужно
-        //     const limitedLikes = likesOnly.slice(0, 3);
+        if (allLikes) {
+            // Фильтруем лайки, оставляя только те, у которых статус равен "Like"
+            const likesOnly = allLikes.filter(like => like.status === 'Like');
+            // Сортируем лайки по полю addedAt в порядке убывания
+            likesOnly.sort((a, b) => new Date(b.addedAt).getTime() - new Date(a.addedAt).getTime());
+            // Ограничиваем количество лайков, если нужно
+            const limitedLikes = likesOnly.slice(0, 3);
 
-        //     newestLikes.push(...limitedLikes.map(like => ({
-        //         addedAt: like.addedAt,
-        //         userId: like.userId,
-        //         login: like.userIogin
-        //     })));
-        // }
+            newestLikes.push(...limitedLikes.map(like => ({
+                addedAt: like.addedAt,
+                userId: like.userId,
+                login: like.userLogin
+            })));
+        }
         return {
             id: post._id.toString(),
             title: post.title,
@@ -123,12 +123,12 @@ export class PostQueryRepository {
             extendedLikesInfo: {
                 likesCount: post.extendedLikesInfo.likesCount,
                 dislikesCount: post.extendedLikesInfo.dislikesCount,
-                myStatus: /*userLikeStatus || */likeStatus.None,
-                newestLikes: /*newestLikes*/[]
+                myStatus: userLikeStatus || likeStatus.None,
+                newestLikes: newestLikes[]
             },
         };
     }
-    mapComment(comment: CommentDocument/*, userLikeStatus?: likeStatus*/): CommentViewModel {
+    mapComment(comment: CommentDocument, userLikeStatus?: likeStatus): CommentViewModel {
         return {
             id: comment.id,
             content: comment.content,
@@ -137,7 +137,7 @@ export class PostQueryRepository {
             likesInfo: {
                 likesCount: comment.likesInfo.likesCount,
                 dislikesCount: comment.likesInfo.dislikesCount,
-                myStatus: /*userLikeStatus || */likeStatus.None
+                myStatus: userLikeStatus || likeStatus.None
             }
         };
     }

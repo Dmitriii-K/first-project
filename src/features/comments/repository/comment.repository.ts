@@ -2,49 +2,46 @@ import { Injectable } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import { ICommentRepository } from "../api/models/interface";
 import { Comment, CommentModelType } from "../domain/comment.entity";
+import { LikeModelType, Like } from "src/features/likes/domain/likes.entity";
+import { LikesType } from "src/features/likes/api/models/input.model";
 
 @Injectable()
 export class CommentRepository /*implements ICommentRepository*/{
-    constructor(@InjectModel(Comment.name) private commentModel: CommentModelType) {}
+    constructor(
+        @InjectModel(Comment.name) private commentModel: CommentModelType,
+        @InjectModel(Like.name) private likesModel: LikeModelType,
+    ) {}
 
-    // async updateComment(id: string, content: string) {
-    //     const mongoId = new ObjectId(id);
-    //     const updateComment = await CommentModel.updateOne({ _id: mongoId }, { $set: { content } });
-    //     return updateComment.modifiedCount === 1;
-    // }
-    // async findAllLikesForPost(postId: string): Promise<LikesType[]> {
-    //     const mongoPostId = new ObjectId(postId);
-    //     return LikesModel.find({ commentId: mongoPostId }).exec();
-    // }
-    // async findLike(commentId: string, userId: string) {
-    //     const mongoCommentId = new ObjectId(commentId);
-    //     const mongoUserId = new ObjectId(userId);
-    //     const like = await LikesModel.findOne({ commentId: mongoCommentId, userId: mongoUserId });
-    //     return like || null;
-    // }
-    // async insertLike(data: LikesType) {
-    //     const result = LikesModel.create(data);
-    //     return (await result)._id.toString();
-    // }
-    // async updateLikeStatus(id: string, updateStatus: string) {
-    //     const mongoId = new ObjectId(id);
-    //     const result = await LikesModel.updateOne({ commentId: mongoId }, { $set: { status: updateStatus } });
-    //     return result.modifiedCount === 1;
-    // }
-    // async updateLikesInfo(commentId: string, likesCount: number, dislikesCount: number) {
-    //     const mongoCommentId = new ObjectId(commentId);
-    //     await CommentModel.updateOne(
-    //         { _id: mongoCommentId },
-    //         { $set: { 'likesInfo.likesCount': likesCount, 'likesInfo.dislikesCount': dislikesCount } }
-    //     );
-    // }
-    // async findUserByComment(id: string) {
-    //     const mongoId = new ObjectId(id);
-    //     return CommentModel.findOne({ _id: mongoId });
-    // }
-    // async deleteComment(id: string) {
-    //     const mongoId = new ObjectId(id);
-    //     const comment = await CommentModel.deleteOne({ _id: mongoId });
-    //     return comment.deletedCount === 1;
-    // }
+    async updateComment(commentId: string, content: string) {
+        const updateComment = await this.commentModel.updateOne({ _id: commentId }, { $set: { content } });
+        return updateComment.modifiedCount === 1;
+    }
+    async findAllLikesForPost(postId: string): Promise<Like[]> {
+        return this.likesModel.find({ commentId: postId }).exec();
+    }
+    async findLike(commentId: string, userId: string) {
+        const like = await this.likesModel.findOne({ commentId: commentId, userId: userId });
+        return like || null;
+    }
+    async insertLike(data: Like) {
+        const result = this.likesModel.create(data);
+        return (await result)._id.toString();
+    }
+    async updateLikeStatus(id: string, updateStatus: string) {
+        const result = await this.likesModel.updateOne({ commentId: id }, { $set: { status: updateStatus } });
+        return result.modifiedCount === 1;
+    }
+    async updateLikesInfo(commentId: string, likesCount: number, dislikesCount: number) {
+        await this.commentModel.updateOne(
+            { _id: commentId },
+            { $set: { 'likesInfo.likesCount': likesCount, 'likesInfo.dislikesCount': dislikesCount } }
+        );
+    }
+    async findUserByComment(commentId: string) {
+        return this.commentModel.findOne({ _id: commentId });
+    }
+    async deleteComment(commentId: string) {
+        const comment = await this.commentModel.deleteOne({ _id: commentId });
+        return comment.deletedCount === 1;
+    }
 }
