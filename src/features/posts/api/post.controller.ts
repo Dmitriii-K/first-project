@@ -71,31 +71,31 @@ export class PostController {
             throw new NotFoundException('post is not found');
         }
     }
-    // @Post(':id/comments')
-    // async createCommentByPostId() {
-    //         const createResult = await this.postService.createCommentByPost(req.params.id, req.body, req.user);
-    //         if (!createResult) {
-    //             res.sendStatus(404);
-    //             return;
-    //         }
-    //         const newComment = await this.postQueryRepository.findCommentById(createResult);
-    //         if (newComment)
-    //             res.status(201).json(newComment);
-    // }
-    // @Put(':id/like-status')
-    // async updateLikeStatus() {
-    //         const user = req.user ? req.user : null;
-    //         const post = await this.postService.findPostById(req.params.id);
-    //         if (!post) {
-    //             res.sendStatus(404);
-    //             return;
-    //         }
-    //         const result = await this.postService.updatePostLike(user, req.body.likeStatus, post);
-    //         if (result) {
-    //             res.sendStatus(204);
-    //             return;
-    //         }
-    //         res.sendStatus(204);
-    //         return;
-    // }
+    @Post(':id/comments')
+    async createCommentByPostId() {
+            const createResult = await this.postService.createCommentByPost(req.params.id, req.body, req.user);
+            if (!createResult) {
+                res.sendStatus(404);
+                return;
+            }
+            const newComment = await this.postQueryRepository.findCommentById(createResult);
+            if (newComment)
+                res.status(201).json(newComment);
+    }
+    @Put(':id/like-status')
+    async updateLikeStatus() {
+            const user = req.user ? req.user : null;
+            const post = await this.postService.findPostById(req.params.id);
+            if (!post) {
+                res.sendStatus(404);
+                return;
+            }
+            const result = await this.postService.updatePostLike(user, req.body.likeStatus, post);
+            if (result) {
+                res.sendStatus(204);
+                return;
+            }
+            res.sendStatus(204);
+            return;
+    }
 }

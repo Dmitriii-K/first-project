@@ -1,4 +1,4 @@
-import { likeStatus, NewestLikesType } from "src/base/types/like.types";
+import { likeStatus, NewestLikesType } from "src/features/likes/api/models/input.model";
 
 export class PostViewModel {
     id: string;
@@ -12,7 +12,7 @@ export class PostViewModel {
         likesCount: number,
         dislikesCount: number,
         myStatus: likeStatus,
-        newestLikes: /*NewestLikesType*/[]
+        newestLikes: NewestLikesType[]
     }
 }
 

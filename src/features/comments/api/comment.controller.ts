@@ -1,84 +1,86 @@
-import { Controller, Get, NotFoundException, Param } from "@nestjs/common";
+import { Body, Controller, Delete, ForbiddenException, Get, HttpCode, NotFoundException, Param, Put, Req, Res, UseGuards } from "@nestjs/common";
 import { CommentViewModel } from "./models/output.model";
 import { ICommentQueryRepository } from "./models/interface";
 import { CommentQueryRepository } from "../repository/comment.query-repository";
+import { CommentService } from "../application/comment.service";
+import { CommentInputModel } from "./models/input.model";
+import { Request, Response } from "express";
+import { likeStatus } from "src/features/likes/api/models/input.model";
+import { JwtAuthGuard } from "src/infrastructure/guards/jwt-auth.guard";
+import { MeViewModel } from "src/features/auth/api/models/output.model";
 
 
 @Controller('comments')
 export class CommentController {
     constructor(
-        protected commentQueryRepository: CommentQueryRepository
+        protected commentQueryRepository: CommentQueryRepository,
+        protected commentService: CommentService,
     ) {}
+    @UseGuards(JwtAuthGuard)
+    @Put(':id/like-status')
+    @HttpCode(204)
+    async likeStatus(
+        @Param('id') id: string,
+        @Body() body: { likeStatus: likeStatus },
+        @Res({ passthrough: true }) res: Response,
+        @Req() req: Request) {
+            const user: MeViewModel | null = req.user ? req.user : null;
+            const comment = await this.commentQueryRepository.findCommentById(id, user!.userId);
+            if (!comment) {
+                throw new NotFoundException();
+            }
+            const result = await this.commentService.likeStatus(user, body.likeStatus, comment);
+            return result;
+    }
+
+    @UseGuards(JwtAuthGuard)
+    @Put(':id')
+    @HttpCode(204)
+    async updateComment(
+        @Param('id') id: string,
+        @Body() body: CommentInputModel,
+        @Res({ passthrough: true }) res: Response,
+        @Req() req: Request) {
+            const findUser = await this.commentService.findUserByComment(id);
+            if (!findUser) {
+                throw new NotFoundException();
+            } else {
+                if (req.user?.userId !== findUser.commentatorInfo.userId.toString()) {
+                    throw new ForbiddenException();
+                }
+                const updateResult = await this.commentService.updateComment(id, body.content);
+                return updateResult;
+            }
+    }
+
+    @UseGuards(JwtAuthGuard)
+    @Delete(':id')
+    @HttpCode(204)
+    async deleteComment(
+        @Param('id') id: string,
+        @Res({ passthrough: true }) res: Response,
+        @Req() req: Request) {
+            const user = await this.commentService.findUserByComment(id);
+            if (!user) {
+                throw new NotFoundException();
+            } else {
+                if (req.user?.userId !== user.commentatorInfo.userId.toString()) {
+                    throw new ForbiddenException();
+                }
+                const deleteComment = await this.commentService.deleteComment(id);
+                return deleteComment;
+            }
+    }
 
     @Get(':id')
-    async getComment(@Param('id') id: string) {
-        // const userId: string | null = req.user ? req.user._id.toString() : null;
-        const comment: CommentViewModel | null = await this.commentQueryRepository.findCommentById(id/*, userId*/);
+    async getComment(
+        @Param('id') id: string,
+        @Res({ passthrough: true }) res: Response,
+        @Req() req: Request) {
+        const userId: string | null = req.user ? req.user.userId : null;
+        const comment: CommentViewModel | null = await this.commentQueryRepository.findCommentById(id, userId);
         if (!comment) {
-            throw new NotFoundException(`Comment is not found`);
+            throw new NotFoundException();
         }
     }
-    // async updateComment(req: Request<ComId, {}, CommentInputModel>, res: Response) {
-    //     try {
-    //         const findUser = await this.commentService.findUserByComment(req.params.id);
-    //         if (!findUser) {
-    //             res.sendStatus(404); // null
-    //         } else {
-    //             if (req.user._id.toString() !== findUser.commentatorInfo.userId.toString()) {
-    //                 res.sendStatus(403);
-    //                 return;
-    //             }
-    //             const updateResult = await this.commentService.updateComment(req.params.id, req.body.content);
-    //             if (updateResult) {
-    //                 res.sendStatus(204);
-    //             }
-    //         }
-    //         return;
-    //     } catch (error) {
-    //         console.log(error);
-    //         res.sendStatus(500);
-    //     }
-    // }
-    // async likeStatus(req: Request<ComId, {}, { likeStatus: likeStatus }>, res: Response) {
-    //     try {
-    //         const user = req.user ? req.user : null;
-    //         const comment = await this.commentQueryRepository.findCommentById(req.params.id, user._id.toString());
-    //         if (!comment) {
-    //             res.sendStatus(404);
-    //             return;
-    //         }
-    //         const result = await this.commentService.likeStatus(user, req.body.likeStatus, comment);
-    //         if (result) {
-    //             res.sendStatus(204);
-    //             return;
-    //         }
-
-    //         res.sendStatus(204);
-    //         return;
-    //     } catch (error) {
-    //         console.log(error);
-    //         res.sendStatus(500);
-    //     }
-    // }
-    // async deleteComment(req: Request, res: Response) {
-    //     try {
-    //         const user = await this.commentService.findUserByComment(req.params.id);
-    //         if (!user) {
-    //             res.sendStatus(404); // null
-    //         } else {
-    //             if (req.user._id.toString() !== user.commentatorInfo.userId.toString()) {
-    //                 res.sendStatus(403);
-    //                 return;
-    //             }
-    //             const deleteComment = await this.commentService.deleteComment(req.params.id);
-    //             if (deleteComment) {
-    //                 res.sendStatus(204); // true
-    //             }
-    //         }
-    //         return;
-    //     } catch (error) {
-    //         console.log(error);
-    //         res.sendStatus(500);
-    //     }
-    // }
 }
