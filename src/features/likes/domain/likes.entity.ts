@@ -14,6 +14,14 @@ import { Trim } from 'src/infrastructure/decorators/transform/trim';
 // })
 // export const LikesModel = mongoose.model<LikesType>('likes', LikesSchema)
 
+// export const likeStatusValidation = [
+//     body("likeStatus")
+//     .isString()
+//     .trim()
+//     .isIn(enumValues)
+//     .withMessage("Invalid value")
+// ];
+
 @Schema()
 export class Like {
     @Prop({ required: true })

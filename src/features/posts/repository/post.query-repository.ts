@@ -9,6 +9,7 @@ import { TypePostHalper } from "src/base/types/post.types";
 import { postPagination } from "src/base/models/post.model";
 import { commentsPagination } from "src/base/models/comment.model";
 import { likeStatus, LikesType, NewestLikesType } from "src/features/likes/api/models/input.model";
+import { MeViewModel } from "src/features/auth/api/models/output.model";
 
 
 @Injectable()
@@ -19,7 +20,7 @@ export class PostQueryRepository {
         @InjectModel(Comment.name) private commentModel: CommentModelType
     ) {}
 
-    async getAllPosts(helper: TypePostHalper, user: PostDocument | null): Promise<PaginatorPostViewModel> {
+    async getAllPosts(helper: TypePostHalper, user: MeViewModel | null): Promise<PaginatorPostViewModel> {
         const queryParams = postPagination(helper);
         const posts: PostDocument[] = (await this.postModel
             .find({})
@@ -32,7 +33,7 @@ export class PostQueryRepository {
         const items = await Promise.all(posts.map(async post => {
             let like;
             if (user) {
-                like = await this.commentRepository.findLike(post._id.toString(), user._id.toString());
+                like = await this.commentRepository.findLike(post._id.toString(), user.userId);
             }
             const allLikes = await this.commentRepository.findAllLikesForPost(post._id.toString());
             const userLikeStatus = like ? like.status : likeStatus.None;

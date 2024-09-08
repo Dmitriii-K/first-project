@@ -16,6 +16,7 @@ export class CommentController {
         protected commentQueryRepository: CommentQueryRepository,
         protected commentService: CommentService,
     ) {}
+    
     @UseGuards(JwtAuthGuard)
     @Put(':id/like-status')
     @HttpCode(204)
@@ -24,12 +25,12 @@ export class CommentController {
         @Body() body: { likeStatus: likeStatus },
         @Res({ passthrough: true }) res: Response,
         @Req() req: Request) {
-            const user: MeViewModel | null = req.user ? req.user : null;
+            const user = req.user ? req.user : null;
             const comment = await this.commentQueryRepository.findCommentById(id, user!.userId);
             if (!comment) {
                 throw new NotFoundException();
             }
-            const result = await this.commentService.likeStatus(user, body.likeStatus, comment);
+            const result = await this.commentService.likeStatus(user!, body.likeStatus, comment);
             return result;
     }
 

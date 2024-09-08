@@ -42,6 +42,7 @@ export class RegistrationConfirmationCodeModel {
     @IsNotEmpty()
     code: string;
 }
+
 export interface RequestUserDTO  {
     login: string,
     email: string,

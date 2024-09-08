@@ -1,9 +1,15 @@
-import { Body, Controller, Delete, Get, HttpCode, NotFoundException, Param, Post, Put, Query } from "@nestjs/common";
+import { Body, Controller, Delete, Get, HttpCode, NotFoundException, Param, Post, Put, Query, Req, Res, UseGuards } from "@nestjs/common";
 import { PostService } from "../application/post.service";
 import { PostQueryRepository } from "../repository/post.query-repository";
 import { TypePostHalper } from "src/base/types/post.types";
 import { PostInputModel } from "./models/input.model";
 import { PostRepository } from "../repository/post.repository";
+import { likeStatus } from "src/features/likes/api/models/input.model";
+import { Request, Response } from "express";
+import { MeViewModel } from "src/features/auth/api/models/output.model";
+import { CommentInputModel } from "src/features/comments/api/models/input.model";
+import { BasicAuthGuard } from "src/infrastructure/guards/basic.guard";
+import { JwtAuthGuard } from "src/infrastructure/guards/jwt-auth.guard";
 
 
 @Controller('posts')
@@ -14,43 +20,93 @@ export class PostController {
         protected postRepository: PostRepository,
     ) {}
 
+    @UseGuards(JwtAuthGuard)
+    @Put(':id/like-status')
+    @HttpCode(204)
+    async updateLikeStatus(
+        @Param('id') id: string,
+        @Body() body: { likeStatus: likeStatus },
+        @Res({ passthrough: true }) res: Response,
+        @Req() req: Request
+    ) {
+        const user = req.user ? req.user : null;
+        const post = await this.postService.findPostById(id);
+        if (!post) {
+            throw new NotFoundException();
+            }
+        const result = await this.postService.updatePostLike(user!, body.likeStatus, post);
+        return result;
+    }
+
     @Get(':id/comments')
     async getCommentByPost(
         @Query() query: TypePostHalper,
-        @Param('id') id: string) {
-        // const userId: string | null = req.user ? req.user._id.toString() : null;
-        const comments = await this.postQueryRepository.findCommentByPost(query, id/*, userId*/);
+        @Param('id') id: string,
+        @Res({ passthrough: true }) res: Response,
+        @Req() req: Request) {
+        const userId: string | null = req.user ? req.user.userId : null;
+        const comments = await this.postQueryRepository.findCommentByPost(query, id, userId);
         if (comments.items.length < 1) {
-            throw new NotFoundException('comment is not exists');
+            throw new NotFoundException();
             }
             return comments;
     }
+
+    @UseGuards(JwtAuthGuard)
+    @Post(':id/comments')
+    async createCommentByPostId(
+        @Body() body: CommentInputModel,
+        @Param('id') id: string,
+        @Res({ passthrough: true }) res: Response,
+        @Req() req: Request
+    ) {
+            const createResult = await this.postService.createCommentByPost(id, body, req.user!);
+            if (!createResult) {
+                throw new NotFoundException();
+            }
+            const newComment = await this.postQueryRepository.findCommentById(createResult);
+            return newComment;
+    }
+
     @Get()
-    async getPosts(@Query() query: TypePostHalper) {
-        // const user = req.user ? req.user : null;
-        const posts = await this.postQueryRepository.getAllPosts(query/*, user*/);
+    async getPosts(
+        @Query() query: TypePostHalper,
+        @Res({ passthrough: true }) res: Response,
+        @Req() req: Request) {
+        const user = req.user ? req.user : null;
+        const posts = await this.postQueryRepository.getAllPosts(query, user);
         return posts;
     }
+
+    @UseGuards(BasicAuthGuard)
     @Post()
-    async createPost(@Body() body: PostInputModel) {
-        // const userId: string | null = req.user ? req.user._id.toString() : null;
+    async createPost(
+        @Body() body: PostInputModel,
+        @Res({ passthrough: true }) res: Response,
+        @Req() req: Request) {
+        const userId: string | null = req.user ? req.user.userId : null;
         const createResult = await this.postService.createPost(body, body.blogId); // запрос на проверку BlogId в middleware
         if (!createResult) {
-            throw new NotFoundException('Post not create');
+            throw new NotFoundException();
         }
-        const newPost = await this.postQueryRepository.findPostById(createResult/*, userId*/);
+        const newPost = await this.postQueryRepository.findPostById(createResult, userId);
         return newPost;
     }
-    @Get(':id')
-    async getPostById(@Param('id') id: string) {
 
-        // const userId: string | null = req.user ? req.user._id.toString() : null;
-        const postResult = await this.postQueryRepository.findPostById(id/*, userId*/);
+    @Get(':id')
+    async getPostById(
+        @Param('id') id: string,
+        @Res({ passthrough: true }) res: Response,
+        @Req() req: Request) {
+        const userId: string | null = req.user ? req.user.userId : null;
+        const postResult = await this.postQueryRepository.findPostById(id, userId);
         if (!postResult) {
-            throw new NotFoundException('post is not found');
+            throw new NotFoundException();
         }
         return postResult;
     }
+
+    @UseGuards(BasicAuthGuard)
     @Put(':id')
     @HttpCode(204)
     async updatePost(
@@ -58,44 +114,19 @@ export class PostController {
         @Body() body: PostInputModel) {
             const findPost = await this.postService.findPostById(id);
             if (!findPost) {
-                throw new NotFoundException('post is not found');
+                throw new NotFoundException();
             }
             const updateResult = await this.postService.updatePost(body, id);
             return updateResult;
     }
+
+    @UseGuards(BasicAuthGuard)
     @Delete(':id')
     @HttpCode(204)
     async deletePost(@Param('id') id: string) {
         const deleteResult = await this.postRepository.deletePost(id);
         if (!deleteResult) {
-            throw new NotFoundException('post is not found');
+            throw new NotFoundException();
         }
-    }
-    @Post(':id/comments')
-    async createCommentByPostId() {
-            const createResult = await this.postService.createCommentByPost(req.params.id, req.body, req.user);
-            if (!createResult) {
-                res.sendStatus(404);
-                return;
-            }
-            const newComment = await this.postQueryRepository.findCommentById(createResult);
-            if (newComment)
-                res.status(201).json(newComment);
-    }
-    @Put(':id/like-status')
-    async updateLikeStatus() {
-            const user = req.user ? req.user : null;
-            const post = await this.postService.findPostById(req.params.id);
-            if (!post) {
-                res.sendStatus(404);
-                return;
-            }
-            const result = await this.postService.updatePostLike(user, req.body.likeStatus, post);
-            if (result) {
-                res.sendStatus(204);
-                return;
-            }
-            res.sendStatus(204);
-            return;
     }
 }

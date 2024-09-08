@@ -5,16 +5,14 @@ import { BlogRepository } from 'src/features/blogs/repository/blog.repository';
 
 @Injectable()
 export class BlogExistsPipe implements PipeTransform {
-    constructor(
-        protected blogRepository: BlogRepository
-    ) {}
+  constructor(
+    protected blogRepository: BlogRepository
+  ) {}
   async transform(value: string, { metatype }: ArgumentMetadata) {
     const foundBlog = await this.blogRepository.findBlogById(value)
     if (!foundBlog) {
-        throw new NotFoundException('blog is not exists');
+      throw new NotFoundException('blog is not exists');
     }
     return value;
   }
-
-
 }

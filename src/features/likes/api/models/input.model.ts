@@ -22,3 +22,11 @@ export class NewestLikesType {
     userId: string;
     login: string
 }
+
+// export const likeStatusValidation = [
+//     body("likeStatus")
+//     .isString()
+//     .trim()
+//     .isIn(enumValues)
+//     .withMessage("Invalid value")
+// ];
