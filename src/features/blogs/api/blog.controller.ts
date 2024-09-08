@@ -53,7 +53,7 @@ export class BlogController {
         @Body() body: BlogPostInputModel) {
             const findBlog = await this.blogService.findBlogById(id);
             if (!findBlog) {
-                throw new NotFoundException('blog is not exists');
+                throw new NotFoundException();
             }
             const createResult = await this.blogService.createPostForBlog(id, body, findBlog.name);
             const newPostForBlog = await this.blogQueryRepository.getPostForBlogById(createResult);

@@ -51,6 +51,8 @@ import { ConfigModule } from '@nestjs/config';
 import { SETTINGSFUNCTION } from './settings/app-setting-function';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
+import { Like, LikesSchema } from './features/likes/domain/likes.entity';
+import { BlogIsExistConstraint } from './infrastructure/decorators/validate/blog-is-exist.decorator';
 
 
 @Module({
@@ -63,6 +65,7 @@ import { APP_GUARD } from '@nestjs/core';
       { name: Post.name, schema: PostSchema },
       { name: Session.name, schema: SessionSchema },
       { name: ApiInfo.name, schema: ApiSchema },
+      { name: Like.name, schema: LikesSchema },
     ]),
     JwtModule.register({
       global: true,
@@ -95,7 +98,7 @@ import { APP_GUARD } from '@nestjs/core';
     AppService,
     TestingService,
     LocalStrategy, JwtStrategy, BasicStrategy,
-    LoginIsExistConstraint, EmailIsExistConstraint,
+    LoginIsExistConstraint, EmailIsExistConstraint, BlogIsExistConstraint,
     UserService, UserQueryRepository, UserRepository,
     BcryptService, EmailService, JwtService,
     CommentService, CommentQueryRepository, CommentRepository,
