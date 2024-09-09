@@ -1,8 +1,6 @@
 import {Prop, Schema, SchemaFactory} from '@nestjs/mongoose';
 import {HydratedDocument, Model} from 'mongoose'
 import { likeStatus } from '../api/models/input.model';
-import { IsEnum, IsString } from 'class-validator';
-import { Trim } from 'src/infrastructure/decorators/transform/trim';
 
 
 // const LikesSchema = new mongoose.Schema<LikesType>({
@@ -25,43 +23,33 @@ import { Trim } from 'src/infrastructure/decorators/transform/trim';
 @Schema()
 export class Like {
     @Prop({ required: true })
-    @IsString()
-    @Trim()
     addedAt: string;
 
     @Prop({ required: true })
-    @IsString()
-    @Trim()
     commentId: string;
 
     @Prop({ required: true })
-    @IsString()
-    @Trim()
     userId: string;
 
     @Prop({ required: true })
-    @IsString()
-    @Trim()
     userLogin: string;
 
     @Prop({ type: String, enum: Object.values(likeStatus), required: true, default: likeStatus.None })
-    @IsString()
-    @Trim()
-    @IsEnum(likeStatus)
     status: likeStatus;
 
     static createLike(commentId: string, userId: string, login: string, data: likeStatus): Like {
         const like = new this();
+
+        // console.table({commentId: commentId, userId: userId,status: data})
         
         like.addedAt = new Date().toISOString();
         like.commentId = commentId;
         like.userId = userId;
         like.userLogin = login;
-        like.status = data
+        like.status = data || likeStatus.None
 
         return like;
     }
-
 }
 
 export const LikesSchema = SchemaFactory.createForClass(Like);

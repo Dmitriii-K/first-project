@@ -8,6 +8,7 @@ import { BlogRepository } from "../repository/blog.repository";
 import { BlogExistsPipe } from "src/infrastructure/pipes/blogExists.pipe";
 import { Request, Response } from "express";
 import { BasicAuthGuard } from "src/infrastructure/guards/basic.guard";
+import { SoftAuthGuard } from "src/infrastructure/guards/dubl-guards/soft-auth.guard copy";
 
 
 @Controller('blogs')
@@ -24,17 +25,18 @@ export class BlogController {
         return blogs;
     }
 
-    @Post()
     @UseGuards(BasicAuthGuard)
+    @Post()
     async createBlog(@Body() body: BlogInputModel) {
         const createResult = await this.blogService.createBlog(body);
         if (!createResult) {
-            throw new NotFoundException('Blog not create');
+            throw new NotFoundException();
         }
         const newBlog = await this.blogQueryRepository.getBlogById(createResult);
         return newBlog;
     }
 
+    @UseGuards(SoftAuthGuard)
     @Get(':id/posts')
     async getPostForBlog(
         @Query() query: TypePostForBlogHalper,
@@ -42,12 +44,15 @@ export class BlogController {
         @Res({ passthrough: true }) res: Response,
         @Req() req: Request) {
             const userId: string | null = req.user ? req.user.userId : null;
-            
-            return await this.blogQueryRepository.getPostFofBlog(query, id, userId);
+            const posts = await this.blogQueryRepository.getPostFofBlog(query, id, userId);
+            if(!posts) {
+                throw new NotFoundException();
+            }
+            return posts;
     }
 
-    @Post(':id/posts')
     @UseGuards(BasicAuthGuard)
+    @Post(':id/posts')
     async createPostForBlog(
         @Param('id') id: string,
         @Body() body: BlogPostInputModel) {
@@ -64,32 +69,32 @@ export class BlogController {
     async getBlogById(@Param('id') id: string) {
         const blogResult = await this.blogQueryRepository.getBlogById(id);
         if (!blogResult) {
-            throw new NotFoundException('blog is not found');
+            throw new NotFoundException();
         }
         return blogResult;
     }
 
-    @Put(':id')
     @UseGuards(BasicAuthGuard)
+    @Put(':id')
     @HttpCode(204)
     async updateBlog(
         @Param('id') id: string,
         @Body() body: BlogInputModel) {
             const findBlog = await this.blogService.findBlogById(id);
             if (!findBlog) {
-                throw new NotFoundException('blog is not found');
+                throw new NotFoundException();
             }
             const updateBlogResult = await this.blogService.updateBlog(id, body);
             return updateBlogResult;
     }
 
-    @Delete(':id')
     @UseGuards(BasicAuthGuard)
+    @Delete(':id')
     @HttpCode(204)
     async deleteBlog(@Param('id') id: string) {
         const deleteResult = await this.blogService.deleteBlog(id);
         if (!deleteResult) {
-        throw new NotFoundException('blog is not found');
+        throw new NotFoundException();
         }
     }
 }

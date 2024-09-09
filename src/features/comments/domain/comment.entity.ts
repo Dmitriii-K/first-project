@@ -7,39 +7,30 @@ import { Trim } from 'src/infrastructure/decorators/transform/trim';
 @Schema({ _id: false })
 class CommentatorInfo {
 @Prop({ type: String, required: true })
-@IsString()
-@Trim()
 userId: string;
 
 @Prop({ type: String, required: true })
-@IsString()
-@Trim()
 userLogin: string;
 }
 
 @Schema({ _id: false })
 class LikesCount {
 @Prop({ type: Number, required: true, default: 0 })
-@IsNumber()
 likesCount: number;
 
 @Prop({ type: Number, required: true, default: 0 })
-@IsNumber()
 dislikesCount: number;
 }
 
 @Schema()
 export class Comment {
 @Prop({ type: String, required: true })
-@IsString()
-@Trim()
 postId: string;
 
 @Prop({ type: String, required: true })
 content: string;
 
 @Prop({ type: String, required: true })
-@IsString()
 createdAt: string;
 
 @Prop({ type: CommentatorInfo, required: true })

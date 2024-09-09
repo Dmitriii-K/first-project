@@ -49,7 +49,9 @@ export class PostQueryRepository {
         };
     }
     async findPostById(postId: string, userId: string | null) {
+        // console.log(`userId`,userId);////////////////
         const post = await this.postModel.findOne({ _id: postId });
+        // console.log(`post`,post);////////////////
         if (!post) {
             return null;
         }
@@ -59,6 +61,8 @@ export class PostQueryRepository {
         }
         const allLikes = await this.commentRepository.findAllLikesForPost(post._id.toString());
         const userLikeStatus = like ? like.status : likeStatus.None;
+        // console.log(`userLikeStatus`,userLikeStatus);////////////////
+        // console.log(`like`,like);////////////////
         return this.mapPost(post, userLikeStatus, allLikes);
     }
     async findCommentById(commentId: string) {
@@ -125,7 +129,7 @@ export class PostQueryRepository {
                 likesCount: post.extendedLikesInfo.likesCount,
                 dislikesCount: post.extendedLikesInfo.dislikesCount,
                 myStatus: userLikeStatus || likeStatus.None,
-                newestLikes: newestLikes[]
+                newestLikes: newestLikes
             },
         };
     }

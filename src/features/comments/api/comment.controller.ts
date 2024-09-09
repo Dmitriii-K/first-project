@@ -5,9 +5,10 @@ import { CommentQueryRepository } from "../repository/comment.query-repository";
 import { CommentService } from "../application/comment.service";
 import { CommentInputModel } from "./models/input.model";
 import { Request, Response } from "express";
-import { likeStatus } from "src/features/likes/api/models/input.model";
+import { likeStatus, LikeStatusDto } from "src/features/likes/api/models/input.model";
 import { JwtAuthGuard } from "src/infrastructure/guards/jwt-auth.guard";
 import { MeViewModel } from "src/features/auth/api/models/output.model";
+import { SoftAuthGuard } from "src/infrastructure/guards/dubl-guards/soft-auth.guard copy";
 
 
 @Controller('comments')
@@ -22,15 +23,15 @@ export class CommentController {
     @HttpCode(204)
     async likeStatus(
         @Param('id') id: string,
-        @Body() body: { likeStatus: likeStatus },
+        @Body() body: LikeStatusDto,
         @Res({ passthrough: true }) res: Response,
         @Req() req: Request) {
             const user = req.user ? req.user : null;
             const comment = await this.commentQueryRepository.findCommentById(id, user!.userId);
-            if (!comment) {
+            if (!comment || !user) {
                 throw new NotFoundException();
             }
-            const result = await this.commentService.likeStatus(user!, body.likeStatus, comment);
+            const result = await this.commentService.likeStatus(user, body.likeStatus, comment);
             return result;
     }
 
@@ -73,6 +74,7 @@ export class CommentController {
             }
     }
 
+    @UseGuards(SoftAuthGuard)
     @Get(':id')
     async getComment(
         @Param('id') id: string,
@@ -83,5 +85,6 @@ export class CommentController {
         if (!comment) {
             throw new NotFoundException();
         }
+        return comment;
     }
 }

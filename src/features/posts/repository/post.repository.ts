@@ -4,7 +4,7 @@ import { Post, PostDocument, PostModelType } from "../domain/post.entity";
 import { Comment, CommentDocument, CommentModelType } from "src/features/comments/domain/comment.entity";
 import { PostInputModel } from "../api/models/input.model";
 import { Blog, BlogModelType } from "src/features/blogs/domain/blog.entity";
-
+import {WithId} from "mongodb"
 
 @Injectable()
 export class PostRepository {
@@ -17,7 +17,7 @@ export class PostRepository {
     async findBlogNameForId(BlogId: string) {
         return this.blogModel.findOne({ _id: BlogId });
     }
-    async findPostById(postId: string) {
+    async findPostById(postId: string): Promise<WithId<Post> | null>{
         return this.postModel.findOne({ _id: postId });
     }
     async insertPost(data: Post) {

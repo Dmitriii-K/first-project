@@ -15,11 +15,11 @@ export class BlogIsExistConstraint implements ValidatorConstraintInterface {
     constructor(private readonly blogRepository: BlogRepository) { }
     async validate(value: any, args: ValidationArguments) {
     const blogIsExist = await this.blogRepository.blogIsExist(value);
-    return !blogIsExist;
+    return blogIsExist;
 }
 
     defaultMessage(validationArguments?: ValidationArguments): string {
-    return `Blog ${validationArguments?.value} already exist`;
+    return `BlogId ${validationArguments?.value} not exist`;
     }
 }
 

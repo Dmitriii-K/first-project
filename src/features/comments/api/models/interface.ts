@@ -1,8 +1,8 @@
 import { UserDBModel } from "src/base/types/user.types";
 import { CommentViewModel } from "./output.model";
-import { LikesType, likeStatus } from "src/base/types/like.types";
 import { CommentDBType } from "src/base/types/comment.types";
 import { CommentDocument } from "../../domain/comment.entity";
+import { likeStatus, LikesType } from "src/features/likes/api/models/input.model";
 
 export interface ICommentService {
     findUserByComment(commentId: string): Promise<CommentDBType | null>;
@@ -12,7 +12,7 @@ export interface ICommentService {
 }
 
 export interface ICommentQueryRepository {
-    findCommentById(commentId: string/*, userId: string | null*/): Promise<CommentViewModel | null>;
+    findCommentById(commentId: string, userId: string | null): Promise<CommentViewModel | null>;
     mapComment(comment: CommentDocument, userLikeStatus?: likeStatus): CommentViewModel;
 }
 

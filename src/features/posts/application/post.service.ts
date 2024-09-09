@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common";
+import { BadRequestException, Injectable, NotFoundException } from "@nestjs/common";
 import { CommentRepository } from "src/features/comments/repository/comment.repository";
 import { PostRepository } from "../repository/post.repository";
 import { PostInputModel } from "../api/models/input.model";
@@ -9,7 +9,7 @@ import { Comment, CommentDocument } from "src/features/comments/domain/comment.e
 import { MeViewModel } from "src/features/auth/api/models/output.model";
 import { likeStatus } from "src/features/likes/api/models/input.model";
 import { Like } from "src/features/likes/domain/likes.entity";
-
+import {WithId} from "mongodb"
 
 @Injectable()
 export class PostService {
@@ -21,18 +21,20 @@ export class PostService {
     async createPost(data: PostInputModel, id: string) {
         const findBlogNameForId = await this.postRepository.findBlogNameForId(id);
         if (!findBlogNameForId) {
-            throw new Error('Blog not found');// Норм?
+            throw new BadRequestException({ errorsMessages: { message: "This blog is incorrect", field: "blog" } });
         }
-        
         const newPost: Post = Post.createPost(data.title, data.shortDescription, data.content, data.blogId, findBlogNameForId.name);
         return this.postRepository.insertPost(newPost);
     }
     async createCommentByPost(paramId: string, data: CommentInputModel, user: MeViewModel) {
         const post = await this.postRepository.findPostById(paramId);
+        if(!post) {
+            throw new NotFoundException()
+        }
         const newComment: Comment = Comment.createComment(paramId, data.content, user.userId, user.login)
         return this.postRepository.insertComment(newComment);
     }
-    async updatePostLike(user: MeViewModel, data: likeStatus, post: PostDocument) {
+    async updatePostLike(user: MeViewModel, data: likeStatus, post: WithId<Post>) {
         const existLike = await this.commentRepository.findLike(post._id.toString(), user.userId);
         if (!existLike) {
             const newLike: Like = Like.createLike(post._id.toString(), user.userId, user.login, data);
@@ -81,7 +83,7 @@ export class PostService {
     async getPostById(postId: string) {
         return this.postRepository.findPostById(postId);
     }
-    async findPostById(postId: string) {
+    async findPostById(postId: string): Promise<WithId<Post> | null>  {
         return this.postRepository.findPostById(postId);
     }
 }
