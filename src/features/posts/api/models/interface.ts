@@ -2,12 +2,12 @@ import { CommentInputModel } from "src/features/comments/api/models/input.model"
 import { PostInputModel } from "./input.model";
 import { UserDocument } from "src/features/users/domain/user.entity";
 import { PostDocument } from "../../domain/post.entity";
-import { likeStatus, LikesType } from "src/base/types/like.types";
 import { PaginatorPostViewModel, PostViewModel } from "./output.model";
 import { CommentViewModel } from "src/features/comments/api/models/output.model";
 import { TypePostHalper } from "src/base/types/post.types";
 import { CommentDocument } from "src/features/comments/domain/comment.entity";
 import { BlogDocument } from "src/features/blogs/domain/blog.entity";
+import { likeStatus, LikesType } from "src/features/likes/api/models/input.model";
 
 export interface IPostService {
     createPost(post: PostInputModel, blogId: string): Promise<string | null>;

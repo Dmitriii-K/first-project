@@ -53,6 +53,7 @@ import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
 import { Like, LikesSchema } from './features/likes/domain/likes.entity';
 import { BlogIsExistConstraint } from './infrastructure/decorators/validate/blog-is-exist.decorator';
+import { SoftAuthGuard } from './infrastructure/guards/dubl-guards/soft-auth.guard copy';
 
 
 @Module({
@@ -97,7 +98,7 @@ import { BlogIsExistConstraint } from './infrastructure/decorators/validate/blog
     // },
     AppService,
     TestingService,
-    LocalStrategy, JwtStrategy, BasicStrategy,
+    LocalStrategy, JwtStrategy, BasicStrategy, SoftAuthGuard,
     LoginIsExistConstraint, EmailIsExistConstraint, BlogIsExistConstraint,
     UserService, UserQueryRepository, UserRepository,
     BcryptService, EmailService, JwtService,

@@ -180,7 +180,6 @@ export class AuthService{
         return true;
     }
     async validateUser(login: string, pass: string): Promise<WithId<User> | null> {
-        console.log(login)
         return this.authRepository.findOne(login);
     }
 }

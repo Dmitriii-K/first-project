@@ -1,7 +1,16 @@
+import { IsEnum, IsNotEmpty, IsString } from "class-validator";
+import { Trim } from "src/infrastructure/decorators/transform/trim";
+
 export enum likeStatus {
     None = 'None',
     Like = 'Like',
     Dislike = 'Dislike'
+}
+export class LikeStatusDto {
+    @IsNotEmpty()
+    @Trim()
+    @IsEnum(likeStatus)
+    likeStatus = likeStatus.None;
 }
 
 export class LikesType {
@@ -22,11 +31,3 @@ export class NewestLikesType {
     userId: string;
     login: string
 }
-
-// export const likeStatusValidation = [
-//     body("likeStatus")
-//     .isString()
-//     .trim()
-//     .isIn(enumValues)
-//     .withMessage("Invalid value")
-// ];

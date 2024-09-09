@@ -2,9 +2,9 @@ import { PaginatorPostViewModel, PostViewModel } from "src/features/posts/api/mo
 import { BlogInputModel, BlogPostInputModel } from "./input.model";
 import { BlogViewModel, PaginatorBlogViewModel } from "./output.model";
 import { TypeBlogHalper, TypePostForBlogHalper } from "src/base/types/blog.types";
-import { likeStatus, LikesType } from "src/base/types/like.types";
 import { BlogDocument } from "../../domain/blog.entity";
 import { PostDocument } from "src/features/posts/domain/post.entity";
+import { likeStatus, LikesType } from "src/features/likes/api/models/input.model";
 
 
 export interface IBlogService {

@@ -4,12 +4,13 @@ import { PostQueryRepository } from "../repository/post.query-repository";
 import { TypePostHalper } from "src/base/types/post.types";
 import { PostInputModel } from "./models/input.model";
 import { PostRepository } from "../repository/post.repository";
-import { likeStatus } from "src/features/likes/api/models/input.model";
-import { Request, Response } from "express";
+import { likeStatus, LikeStatusDto } from "src/features/likes/api/models/input.model";
+import { Request, RequestHandler, Response } from "express";
 import { MeViewModel } from "src/features/auth/api/models/output.model";
 import { CommentInputModel } from "src/features/comments/api/models/input.model";
 import { BasicAuthGuard } from "src/infrastructure/guards/basic.guard";
 import { JwtAuthGuard } from "src/infrastructure/guards/jwt-auth.guard";
+import { SoftAuthGuard } from "src/infrastructure/guards/dubl-guards/soft-auth.guard copy";
 
 
 @Controller('posts')
@@ -25,19 +26,20 @@ export class PostController {
     @HttpCode(204)
     async updateLikeStatus(
         @Param('id') id: string,
-        @Body() body: { likeStatus: likeStatus },
+        @Body() body: LikeStatusDto,
         @Res({ passthrough: true }) res: Response,
         @Req() req: Request
     ) {
         const user = req.user ? req.user : null;
         const post = await this.postService.findPostById(id);
-        if (!post) {
+        if (!post || !user) {
             throw new NotFoundException();
             }
-        const result = await this.postService.updatePostLike(user!, body.likeStatus, post);
+        const result = await this.postService.updatePostLike(user, body.likeStatus, post);
         return result;
     }
 
+    @UseGuards(SoftAuthGuard)
     @Get(':id/comments')
     async getCommentByPost(
         @Query() query: TypePostHalper,
@@ -60,14 +62,16 @@ export class PostController {
         @Res({ passthrough: true }) res: Response,
         @Req() req: Request
     ) {
-            const createResult = await this.postService.createCommentByPost(id, body, req.user!);
-            if (!createResult) {
-                throw new NotFoundException();
-            }
-            const newComment = await this.postQueryRepository.findCommentById(createResult);
-            return newComment;
+        const user = req.user ? req.user : null;
+        const createResult = await this.postService.createCommentByPost(id, body, user!);
+        if (!createResult) {
+            throw new NotFoundException();
+        }
+        const newComment = await this.postQueryRepository.findCommentById(createResult);
+        return newComment;
     }
 
+    @UseGuards(SoftAuthGuard)
     @Get()
     async getPosts(
         @Query() query: TypePostHalper,
@@ -78,14 +82,14 @@ export class PostController {
         return posts;
     }
 
-    @UseGuards(BasicAuthGuard)
+    @UseGuards(BasicAuthGuard, SoftAuthGuard)
     @Post()
     async createPost(
         @Body() body: PostInputModel,
         @Res({ passthrough: true }) res: Response,
         @Req() req: Request) {
         const userId: string | null = req.user ? req.user.userId : null;
-        const createResult = await this.postService.createPost(body, body.blogId); // запрос на проверку BlogId в middleware
+        const createResult = await this.postService.createPost(body, body.blogId);
         if (!createResult) {
             throw new NotFoundException();
         }
@@ -93,6 +97,7 @@ export class PostController {
         return newPost;
     }
 
+    @UseGuards(SoftAuthGuard)
     @Get(':id')
     async getPostById(
         @Param('id') id: string,
@@ -117,6 +122,9 @@ export class PostController {
                 throw new NotFoundException();
             }
             const updateResult = await this.postService.updatePost(body, id);
+            if (!updateResult) {
+                throw new NotFoundException();
+            }
             return updateResult;
     }
 

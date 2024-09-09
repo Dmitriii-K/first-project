@@ -1,5 +1,5 @@
 import { CommentatorInfo } from "src/base/types/comment.types";
-import { likeStatus } from "src/base/types/like.types";
+import { likeStatus } from "src/features/likes/api/models/input.model";
 
 export class CommentViewModel {
     id:string;
