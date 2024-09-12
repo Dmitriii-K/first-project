@@ -7,6 +7,7 @@ declare global {
         class User { login: string; email: string; userId: string}
         export interface Request {
             user?: User
+            deviceId? : string
         }
     }
 }

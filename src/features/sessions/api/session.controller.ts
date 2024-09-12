@@ -1,58 +1,59 @@
-import { Controller, Get, NotFoundException, Param } from "@nestjs/common";
+import { Controller, Delete, ForbiddenException, Get, HttpCode, NotFoundException, Param, Req, Res, UnauthorizedException, UseGuards } from "@nestjs/common";
+import { Request } from "express";
+import { CheckTokenAuthGuard } from "src/infrastructure/guards/dubl-guards/check-refresh-token.guard";
+import { SessionsService } from "../application/session.service";
+import { SessionsQueryRepository } from "../repository/session.query-repository";
 
-@Controller('sessions')
+@Controller('security')
 export class SessionController {
-    constructor() {}
+    constructor(
+        protected sessionsService: SessionsService,
+        protected sessionsQueryRepository: SessionsQueryRepository,
+    ) {}
     
-    // async deleteAllSessionsExceptCurrentOne(req: Request, res: Response) {
-    //     try {
-    //         const userId = req.user._id;
-    //         const device_id = req.deviceId;
+    @UseGuards(CheckTokenAuthGuard)
+    @Get('/devices')
+    async getAllSessions(
+        @Res({ passthrough: true }) res: Response,
+        @Req() req: Request) {
+            const sessions = await this.sessionsQueryRepository.findSessions(req.user!.userId);
+            return sessions;
+    }
 
-    //         const result = await this.sessionsService.deleteAllSessionsExceptCurrentOne(userId, device_id);
-    //         if (result) {
-    //             res.sendStatus(204);
-    //             return;
-    //         }
-    //     } catch (error) {
-    //         console.log(error);
-    //         res.sendStatus(500);
-    //     }
-    // }
-    // async deleteSessionsById(req: Request, res: Response) {
-    //     try {
-    //         const findSession = await this.sessionsService.findUserByDeviceId(req.params.id);
-    //         if (!findSession) {
-    //             res.sendStatus(404);
-    //             return;
-    //         } else {
-    //             if (req.user._id.toString() !== findSession.user_id) {
-    //                 res.sendStatus(403);
-    //                 return;
-    //             }
-    //         }
+    @UseGuards(CheckTokenAuthGuard)
+    @Delete('/devices')
+    @HttpCode(204)
+    async deleteAllSessionsExceptCurrentOne(
+        @Res({ passthrough: true }) res: Response,
+        @Req() req: Request) {
+            const userId = req.user!.userId;
+            const device_id = req.deviceId;
+            if(!device_id) throw new UnauthorizedException()
 
-    //         const deleteDevice = await this.sessionsService.deleteSessionById(req.params.id);
-    //         if (deleteDevice) {
-    //             res.sendStatus(204);
-    //         } else {
-    //             res.sendStatus(404);
-    //             return;
-    //         }
-    //     } catch (error) {
-    //         console.log(error);
-    //         res.sendStatus(500);
-    //     }
-    // }
-    // async getAllSessions(req: Request, res: Response<DeviceViewModel[]>) {
-    //     try {
-    //         const sessions = await this.sessionsQueryRepository.findSessions(req.user._id);
-    //         if (sessions) {
-    //             res.status(200).json(sessions);
-    //         }
-    //     } catch (error) {
-    //         console.log(error);
-    //         res.sendStatus(500);
-    //     }
-    // }
+            const result = await this.sessionsService.deleteAllSessionsExceptCurrentOne(userId, device_id);
+            return result;
+    }
+
+    @UseGuards(CheckTokenAuthGuard)
+    @Delete('/devices/:id')
+    @HttpCode(204)
+    async deleteSessionsById(
+        @Param('id') id: string,
+        @Res({ passthrough: true }) res: Response,
+        @Req() req: Request) {
+            const findSession = await this.sessionsService.findUserByDeviceId(id);
+            if (!findSession) {
+                throw new NotFoundException();
+            } else {
+                if (req.user?.userId !== findSession.user_id) {
+                    throw new ForbiddenException();
+                }
+            }
+
+        const deleteDevice = await this.sessionsService.deleteSessionById(id);
+            if (!deleteDevice) {
+                throw new NotFoundException();
+            }
+            return deleteDevice;
+    }
 }

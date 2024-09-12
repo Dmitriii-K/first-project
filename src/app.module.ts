@@ -33,9 +33,9 @@ import { AuthController } from './features/auth/api/auth.controller';
 import { SessionController } from './features/sessions/api/session.controller';
 import { AuthRepository } from './features/auth/repository/auth.repository';
 import { AuthQueryRepository } from './features/auth/repository/auth.query-repository';
-import { SessionService } from './features/sessions/application/session.service';
+import { SessionsService } from './features/sessions/application/session.service';
 import { SessionRepository } from './features/sessions/repository/session.repository';
-import { SessionQueryRepository } from './features/sessions/repository/session.query-repository';
+import { SessionsQueryRepository } from './features/sessions/repository/session.query-repository';
 import { Session, SessionSchema } from './features/sessions/domain/session.entity';
 import { ApiInfo, ApiSchema } from './features/auth/domain/auth.entity';
 import { EmailService } from './infrastructure/adapters/sendEmail';
@@ -54,6 +54,7 @@ import { APP_GUARD } from '@nestjs/core';
 import { Like, LikesSchema } from './features/likes/domain/likes.entity';
 import { BlogIsExistConstraint } from './infrastructure/decorators/validate/blog-is-exist.decorator';
 import { SoftAuthGuard } from './infrastructure/guards/dubl-guards/soft-auth.guard copy';
+import { CheckTokenAuthGuard } from './infrastructure/guards/dubl-guards/check-refresh-token.guard';
 
 
 @Module({
@@ -71,7 +72,7 @@ import { SoftAuthGuard } from './infrastructure/guards/dubl-guards/soft-auth.gua
     JwtModule.register({
       global: true,
       secret: SETTINGS.JWT_SECRET_KEY,
-      signOptions: { expiresIn: '6m' },
+      signOptions: { expiresIn: '10s' },
     }),
     ThrottlerModule.forRoot([{
       ttl: 10000,
@@ -98,7 +99,7 @@ import { SoftAuthGuard } from './infrastructure/guards/dubl-guards/soft-auth.gua
     // },
     AppService,
     TestingService,
-    LocalStrategy, JwtStrategy, BasicStrategy, SoftAuthGuard,
+    LocalStrategy, JwtStrategy, BasicStrategy, SoftAuthGuard, CheckTokenAuthGuard,
     LoginIsExistConstraint, EmailIsExistConstraint, BlogIsExistConstraint,
     UserService, UserQueryRepository, UserRepository,
     BcryptService, EmailService, JwtService,
@@ -106,6 +107,6 @@ import { SoftAuthGuard } from './infrastructure/guards/dubl-guards/soft-auth.gua
     BlogService, BlogRepository, BlogQueryRepository,
     PostService, PostRepository, PostQueryRepository,
     AuthService, AuthRepository, AuthQueryRepository,
-    SessionService, SessionRepository, SessionQueryRepository],
+    SessionsService, SessionRepository, SessionsQueryRepository],
 })
 export class AppModule {}

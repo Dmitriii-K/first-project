@@ -9,6 +9,7 @@ import { randomUUID } from "crypto";
 import { NewPasswordRecoveryInputModel } from "../api/models/input.model";
 import { UserInputModel } from "src/features/users/api/models/input.models";
 import {WithId} from "mongodb"
+import { MeViewModel } from "../api/models/output.model";
 
 @Injectable()
 export class AuthService{
@@ -44,58 +45,19 @@ export class AuthService{
         // };
         const newUserForRegistration: User = User.createUserForRegistration(data.login, password, data.email);
         await this.authRepository.createUser(newUserForRegistration); // сохранить юзера в базе данных
-        await this.emailService.sendMail(newUserForRegistration.email, newUserForRegistration.emailConfirmation.confirmationCode);
+        this.emailService.sendMail(newUserForRegistration.email, newUserForRegistration.emailConfirmation.confirmationCode);
         return newUserForRegistration;
     }
-    // async updateRefreshToken(user: WithId<UserDBModel>, deviceId: string) {
-    //     const newPairTokens = this.jwtService.generateToken(user, deviceId);
-    //     const { accessToken, refreshToken } = newPairTokens;
-    //     const payload = this.jwtService.getUserIdByToken(refreshToken);
-    //     if (!payload) throw new Error('пейлода нет, хотя он должен быть после создания новой пары');
-    //     let { iat } = payload;
-    //     iat = new Date(iat * 1000).toISOString();
-    //     await this.authRepository.updateIat(iat, deviceId);
-    //     return { accessToken, refreshToken };
-    // }
-    // async registerUser(data: UserInputModel) {
-    //     const checkUser = await this.authRepository.checkUserByRegistration(data.login, data.email);
-    //     if (checkUser !== null) return;
-    //     const password = await this.bcryptService.createHashPassword(data.password); //создать хэш пароля
-    //     const newUser: UserDBModel = { // сформировать dto юзера
-    //         login: data.login,
-    //         email: data.email,
-    //         password,
-    //         createdAt: new Date().toString(),
-    //         emailConfirmation: { // доп поля необходимые для подтверждения
-    //             confirmationCode: randomUUID(),
-    //             expirationDate: (add(new Date(), { hours: 1, minutes: 30, })).toISOString(),
-    //             isConfirmed: false
-    //         }
-    //     };
-    //     await this.authRepository.createUser(newUser); // сохранить юзера в базе данных
-    //     await this.emailService.sendMail(newUser.email, newUser.emailConfirmation.confirmationCode);
-    //     return newUser;
-    // }
-    // async confirmEmail(code: string) {
-    //     const user: WithId<UserDBModel> | null = await this.authRepository.findUserByCode(code);
-    //     if (!user) return false;
-    //     if (user.emailConfirmation.isConfirmed) return false;
-    //     if (user.emailConfirmation.confirmationCode !== code) return false;
-    //     if (user.emailConfirmation.expirationDate < new Date().toISOString()) return false;
-    //     const result = await this.authRepository.updateConfirmation(user._id);
-    //     return result;
-    // }
-    // async resendEmail(mail: string) {
-    //     const user: WithId<UserDBModel> | null = await this.authRepository.findUserByEmail(mail);
-    //     if (!user) return false;
-    //     if (user.emailConfirmation.isConfirmed) return false;
-    //     const newCode = randomUUID();
-    //     await Promise.all([
-    //         this.authRepository.updateCode(user._id.toString(), newCode),
-    //         await this.emailService.sendMail(mail, newCode)
-    //     ]);
-    //     return true;
-    // }
+    async updateRefreshToken(user: MeViewModel, deviceId: string) {
+        const newPairTokens = this.jwtService.generateToken(user, deviceId);
+        const { accessToken, refreshToken } = newPairTokens;
+        const payload = this.jwtService.getUserIdByToken(refreshToken);
+        if (!payload) throw new Error('пейлода нет, хотя он должен быть после создания новой пары');
+        let { iat } = payload;
+        iat = new Date(iat * 1000).toISOString();
+        await this.authRepository.updateIat(iat, deviceId);
+        return { accessToken, refreshToken };
+    }
     async createSession(userId: string, token: string, userAgent: string, ip: string) {
         const payload = this.jwtService.getUserIdByToken(token);
         let { iat, exp, deviceId } = payload!;
@@ -112,14 +74,14 @@ export class AuthService{
         const newSession: Session = Session.createSession(userId, deviceId, iat, exp, userAgent, ip);
         await this.authRepository.createSession(newSession);
     }
-    // async authLogoutAndDeleteSession(deviceId: string) {
-    //     const deletedSession = await this.authRepository.deleteSession(deviceId);
-    //     if (deletedSession) {
-    //         return true;
-    //     } else {
-    //         return false;
-    //     }
-    // }
+    async authLogoutAndDeleteSession(deviceId: string) {
+        const deletedSession = await this.authRepository.deleteSession(deviceId);
+        if (deletedSession) {
+            return true;
+        } else {
+            return false;
+        }
+    }
     async newPassword(data: NewPasswordRecoveryInputModel): Promise<boolean> {
         // Проверяем, существует ли пользователь с таким кодом восстановления
         const user: UserDocument | null = await this.authRepository.findUserByCode(data.recoveryCode);
@@ -173,10 +135,8 @@ export class AuthService{
             throw new BadRequestException({ errorsMessages: { message: "This field is verified", field: "email" } });
         }
         const newCode = randomUUID();
-        await Promise.all([
-            this.authRepository.updateCode(user.id, newCode),
-            await this.emailService.sendMail(mail, newCode)
-        ]);
+        await this.authRepository.updateCode(user.id, newCode),
+        this.emailService.sendMail(mail, newCode)
         return true;
     }
     async validateUser(login: string, pass: string): Promise<WithId<User> | null> {
