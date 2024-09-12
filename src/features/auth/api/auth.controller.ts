@@ -1,4 +1,4 @@
-import { BadRequestException, Body, Controller, Get, HttpCode, Post, Req, Res, UnauthorizedException, UseGuards } from "@nestjs/common";
+import { BadRequestException, Body, Controller, Get, HttpCode, HttpException, Post, Req, Res, UnauthorizedException, UseGuards } from "@nestjs/common";
 import { AuthService } from "../application/auth.service";
 import { AuthRepository } from "../repository/auth.repository";
 import { BcryptService } from "src/infrastructure/adapters/bcrypt";
@@ -11,6 +11,7 @@ import { LocalAuthGuard } from "src/infrastructure/guards/local-auth.guard";
 import { JwtAuthGuard } from "src/infrastructure/guards/jwt-auth.guard";
 import { SkipThrottle, Throttle, ThrottlerGuard } from "@nestjs/throttler";
 import { BearerAuthGuard } from "src/infrastructure/guards/dubl-guards/bearer-auth.guard";
+import { CheckTokenAuthGuard } from "src/infrastructure/guards/dubl-guards/check-refresh-token.guard";
 
 @UseGuards(ThrottlerGuard)
 @Controller('auth')
@@ -23,14 +24,13 @@ export class AuthController{
     ) {}
 
     @UseGuards(LocalAuthGuard)
-    @SkipThrottle()
     @Post('login')
     @HttpCode(200)
     async authLoginUser(
-        @Body() body: LoginInputModel,
         @Res({ passthrough: true }) res: Response,
         @Req() req: Request) {
-            const { accessToken, refreshToken } = this.jwtService.generateToken(req.user!);
+            if(!req.user) throw new UnauthorizedException()
+            const { accessToken, refreshToken } = this.jwtService.generateToken(req.user);
             await this.authService.createSession(
                 req.user!.userId,
                 refreshToken,
@@ -57,19 +57,23 @@ export class AuthController{
         return newPassword;
     }
 
-    // @Post()
-    // async authRefreshToken() {
-    //         const device = await this.authRepository.findSessionFromDeviceId(req.deviceId);
-    //         if (!device) {
-    //             res.sendStatus(401);
-    //             return;
-    //         }
-    //         const result = await this.authService.updateRefreshToken(req.user, req.deviceId);
+    @UseGuards(CheckTokenAuthGuard)
+    @Post('refresh-token')
+    async authRefreshToken(
+        @Res() res: Response,
+        @Req() req: Request) {
+            if(!req.user) throw new UnauthorizedException()
+            if(!req.deviceId) throw new UnauthorizedException()
+            const device = await this.authRepository.findSessionFromDeviceId(req.deviceId);
+            if (!device) {
+                throw new UnauthorizedException();
+            }
+            const result = await this.authService.updateRefreshToken(req.user, req.deviceId);
 
-    //         const { accessToken, refreshToken } = result;
-    //         res.cookie('refreshToken', refreshToken, { httpOnly: true, secure: true })
-    //             .status(200).json({ accessToken });
-    // }
+            const { accessToken, refreshToken } = result;
+            res.cookie('refreshToken', refreshToken, { httpOnly: true, secure: true })
+                .status(200).json({ accessToken });
+        }
 
     @Post('registration')
     @HttpCode(204)
@@ -101,19 +105,23 @@ export class AuthController{
         return emailResending;
     }
 
-    // @Post()
-    // async authLogout() {
-    //         const device = await this.authRepository.findSessionFromDeviceId(req.deviceId);
-    //         if (!device) {
-    //             res.sendStatus(401);
-    //             return;
-    //         }
-    //         const result = await this.authService.authLogoutAndDeleteSession(req.deviceId);
-    //         if (result) {
-    //             res.clearCookie('refreshToken');
-    //             res.sendStatus(204);
-    //         }
-    // }
+    @UseGuards(CheckTokenAuthGuard)
+    @Post('logout')
+    @HttpCode(204)
+    async authLogout(
+        @Res() res: Response,
+        @Req() req: Request) {
+            if(!req.deviceId) throw new UnauthorizedException();
+            const device = await this.authRepository.findSessionFromDeviceId(req.deviceId);
+            if (!device) {
+                throw new UnauthorizedException();
+            }
+            const result = await this.authService.authLogoutAndDeleteSession(req.deviceId);
+            if (result) {
+                res.clearCookie('refreshToken');
+                res.sendStatus(204);
+            }
+    }
 
     @SkipThrottle()
     @UseGuards(JwtAuthGuard)

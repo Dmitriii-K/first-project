@@ -1,19 +1,20 @@
 import { Injectable } from "@nestjs/common";
+import { SessionRepository } from "../repository/session.repository";
 
 @Injectable()
-export class SessionService {
-    constructor() {}
+export class SessionsService {
+    constructor(protected sessionRepository: SessionRepository) {}
 
-    // async deleteAllSessionsExceptCurrentOne(userId: string, device_id: string) {
-    //     const result = await this.sessionsRepository.deleteAllSessionsExceptCurrentOne(userId, device_id);
-    //     return result;
-    // }
-    // async deleteSessionById(deviceId: string) {
-    //     const result = await this.sessionsRepository.deleteSessionById(deviceId);
-    //     return result;
-    // }
-    // async findUserByDeviceId(deviceId: string) {
-    //     const result = await this.sessionsRepository.findUserByDeviceId(deviceId);
-    //     return result
-    // }
+    async deleteAllSessionsExceptCurrentOne(userId: string, device_id: string) {
+        const result = await this.sessionRepository.deleteAllSessionsExceptCurrentOne(userId, device_id);
+        return result;
+    }
+    async deleteSessionById(deviceId: string) {
+        const result = await this.sessionRepository.deleteSessionById(deviceId);
+        return result;
+    }
+    async findUserByDeviceId(deviceId: string) {
+        const result = await this.sessionRepository.findUserByDeviceId(deviceId);
+        return result
+    }
 }

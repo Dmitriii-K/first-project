@@ -3,7 +3,6 @@ import { PassportStrategy } from '@nestjs/passport';
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { AuthService } from 'src/features/auth/application/auth.service';
 import { UserDocument } from 'src/features/users/domain/user.entity';
-import { log } from 'console';
 import { BcryptService } from '../adapters/bcrypt';
 
 

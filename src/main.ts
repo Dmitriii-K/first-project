@@ -6,10 +6,12 @@ import { HttpExceptionFilter } from './infrastructure/exception-filters/exceptio
 import { OutputErrorsType } from './base/types/output-errors.types';
 import { useContainer } from 'class-validator';
 import { HttpExceptionFilterTest } from './infrastructure/exception-filters/exp-filtr-test';
+import cookieParser from "cookie-parser"
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.enableCors();
+  app.use(cookieParser());
   useContainer(app.select(AppModule), { fallbackOnErrors: true });
   app.useGlobalPipes(new ValidationPipe({
     transform: true,

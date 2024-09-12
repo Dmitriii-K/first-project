@@ -48,20 +48,20 @@ export class AuthRepository{
         const saveResult = await this.sessionModel.create(session);
         return saveResult._id.toString();
     }
-    // async findSessionFromDeviceId(deviceId: string) {
-    //     return SessionModel.findOne({ device_id: deviceId });
-    // }
-    // async updateIat(iat: string, deviceId: string) {
-    //     await SessionModel.updateOne({ device_id: deviceId }, { $set: { iat: iat } });
-    // }
-    // async deleteSession(deviceId: string) {
-    //     const result = await SessionModel.deleteOne({ device_id: deviceId });
-    //     if (result.deletedCount === 1) {
-    //         return true;
-    //     } else {
-    //         return false;
-    //     }
-    // }
+    async findSessionFromDeviceId(deviceId: string) {
+        return this.sessionModel.findOne({ device_id: deviceId });
+    }
+    async updateIat(iat: string, deviceId: string) {
+        await this.sessionModel.updateOne({ device_id: deviceId }, { $set: { iat: iat } });
+    }
+    async deleteSession(deviceId: string) {
+        const result = await this.sessionModel.deleteOne({ device_id: deviceId });
+        if (result.deletedCount === 1) {
+            return true;
+        } else {
+            return false;
+        }
+    }
     // async resendMail (mail: string) {
     //     return UserModel.findOne({email: mail});
     // }

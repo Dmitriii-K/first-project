@@ -31,10 +31,10 @@ generateToken(user: RequestUserDTO, deviceId?: string): { accessToken: string, r
         deviceId: deviceId ?? randomUUID()
     };
     const optionsAccessToken = {
-        expiresIn: '6000s'
+        expiresIn: '10s'
     };
     const optionsRefreshToken = {
-        expiresIn: '8000s'
+        expiresIn: '20s'
     };
     const secretKey = "123";
     const accessToken: string = jwt.sign(payload, secretKey, optionsAccessToken);
