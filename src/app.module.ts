@@ -47,19 +47,33 @@ import { LocalAuthGuard } from './infrastructure/guards/local-auth.guard';
 import { JwtAuthGuard } from './infrastructure/guards/jwt-auth.guard';
 import { BasicStrategy } from './infrastructure/pasport-strategy/basic.strategy';
 import { PassportModule } from '@nestjs/passport';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { SETTINGSFUNCTION } from './settings/app-setting-function';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
 import { Like, LikesSchema } from './features/likes/domain/likes.entity';
 import { BlogIsExistConstraint } from './infrastructure/decorators/validate/blog-is-exist.decorator';
-import { SoftAuthGuard } from './infrastructure/guards/dubl-guards/soft-auth.guard copy';
+import { SoftAuthGuard } from './infrastructure/guards/dubl-guards/soft-auth.guard';
 import { CheckTokenAuthGuard } from './infrastructure/guards/dubl-guards/check-refresh-token.guard';
+import configuration, { ConfigurationType, Environments } from './settings/configuration';
+import { validate } from './settings/env/configuration';
 
 
 @Module({
   imports: [
-    MongooseModule.forRoot(SETTINGS.MONGO_URL),
+    MongooseModule.forRootAsync({
+      useFactory: (configService: ConfigService<ConfigurationType, true>) => {
+        const environmentSettings = configService.get('environmentSettings', {infer: true,});
+        const databaseSettings = configService.get('databaseSettings', {infer: true,});
+        const uri = environmentSettings.isTesting
+          ? databaseSettings.MONGO_CONNECTION_URI_FOR_TESTS
+          : databaseSettings.MONGO_CONNECTION_URI;
+        console.log(uri);
+        return {uri: uri};
+      },
+      inject: [ConfigService],
+    }),
+    // MongooseModule.forRoot(SETTINGS.MONGO_URL),
     MongooseModule.forFeature([
       { name: User.name, schema: UserSchema },
       { name: Comment.name, schema: CommentSchema },
@@ -81,8 +95,19 @@ import { CheckTokenAuthGuard } from './infrastructure/guards/dubl-guards/check-r
     PassportModule,
     ConfigModule.forRoot({
       isGlobal: true,
-      load: [configFactory],
-  })
+      load: [configuration],
+      validate: validate,// из configuration ?
+      ignoreEnvFile:
+      process.env.ENV !== Environments.DEVELOPMENT &&
+      process.env.ENV !== Environments.TEST,
+      envFilePath: ['.env.development.local', '.env.development', '.env']
+    }),
+    ConfigModule.forRoot({
+    isGlobal: true,
+    load: [configuration],
+    validate: validate,
+
+    }),
   ],
   controllers: [AppController,
     UserController,

@@ -7,6 +7,8 @@ import { OutputErrorsType } from './base/types/output-errors.types';
 import { useContainer } from 'class-validator';
 import { HttpExceptionFilterTest } from './infrastructure/exception-filters/exp-filtr-test';
 import cookieParser from "cookie-parser"
+import { ConfigService } from '@nestjs/config';
+import { ConfigurationType } from './settings/configuration';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -32,9 +34,29 @@ async function bootstrap() {
     }
   }));
   app.useGlobalFilters(new HttpExceptionFilterTest())
+
   // const configService = app.get(ConfigService);
   // const port = configService.get<number>('PORT');
   // await app.listen(port);
   await app.listen(SETTINGS.PORT);
 }
+
+// async function bootstrap() {
+//   const app = await NestFactory.create(AppModule);
+
+//   applyAppSettings(app);
+
+//   const configService = app.get(ConfigService<ConfigurationType, true>);
+//   const apiSettings = configService.get('apiSettings', { infer: true });
+//   const environmentSettings = configService.get('environmentSettings', {
+//     infer: true,
+//   });
+//   const port = apiSettings.PORT;
+
+//   await app.listen(port, () => {
+//     console.log('App starting listen port: ', port);
+//     console.log('ENV: ', environmentSettings.currentEnv);
+//   });
+// }
+
 bootstrap();

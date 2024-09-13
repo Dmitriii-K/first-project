@@ -4,6 +4,7 @@ import {  WithId } from 'mongodb';
 import { randomUUID } from 'crypto';
 import { Injectable } from '@nestjs/common';
 import { RequestUserDTO } from 'src/features/auth/api/models/input.model';
+import { ConfigService } from '@nestjs/config';
 
 
 
@@ -23,6 +24,8 @@ export type UnionPayload = PayloadType & SystemPayload
 
 @Injectable()
 export class JwtService /*implements IJwtService*/ {
+    constructor(private configService: ConfigService) {}// Как подключить ?
+    
 generateToken(user: RequestUserDTO, deviceId?: string): { accessToken: string, refreshToken: string } {
     const payload: PayloadType = {
         userId: user.userId,

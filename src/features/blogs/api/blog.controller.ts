@@ -8,7 +8,7 @@ import { BlogRepository } from "../repository/blog.repository";
 import { BlogExistsPipe } from "src/infrastructure/pipes/blogExists.pipe";
 import { Request, Response } from "express";
 import { BasicAuthGuard } from "src/infrastructure/guards/basic.guard";
-import { SoftAuthGuard } from "src/infrastructure/guards/dubl-guards/soft-auth.guard copy";
+import { SoftAuthGuard } from "src/infrastructure/guards/dubl-guards/soft-auth.guard";
 
 
 @Controller('blogs')

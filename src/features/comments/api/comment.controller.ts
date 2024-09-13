@@ -8,7 +8,7 @@ import { Request, Response } from "express";
 import { likeStatus, LikeStatusDto } from "src/features/likes/api/models/input.model";
 import { JwtAuthGuard } from "src/infrastructure/guards/jwt-auth.guard";
 import { MeViewModel } from "src/features/auth/api/models/output.model";
-import { SoftAuthGuard } from "src/infrastructure/guards/dubl-guards/soft-auth.guard copy";
+import { SoftAuthGuard } from "src/infrastructure/guards/dubl-guards/soft-auth.guard";
 
 
 @Controller('comments')
