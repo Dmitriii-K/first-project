@@ -10,7 +10,7 @@ import { MeViewModel } from "src/features/auth/api/models/output.model";
 import { CommentInputModel } from "src/features/comments/api/models/input.model";
 import { BasicAuthGuard } from "src/infrastructure/guards/basic.guard";
 import { JwtAuthGuard } from "src/infrastructure/guards/jwt-auth.guard";
-import { SoftAuthGuard } from "src/infrastructure/guards/dubl-guards/soft-auth.guard copy";
+import { SoftAuthGuard } from "src/infrastructure/guards/dubl-guards/soft-auth.guard";
 
 
 @Controller('posts')

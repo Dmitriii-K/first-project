@@ -2,9 +2,12 @@ import {CanActivate, ExecutionContext, Injectable, UnauthorizedException} from '
 import { Observable } from 'rxjs';
 import {Request} from "express";
 import { SETTINGS } from 'src/settings/app-settings';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class BasicGuard implements CanActivate {
+    constructor(private configService: ConfigService) {}
+    
     canActivate(
     context: ExecutionContext,
     ): boolean | Promise<boolean> | Observable<boolean> {
