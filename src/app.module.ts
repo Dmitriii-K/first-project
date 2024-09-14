@@ -24,8 +24,8 @@ import { PostRepository } from './features/posts/repository/post.repository';
 import { PostQueryRepository } from './features/posts/repository/post.query-repository';
 import { BlogController } from './features/blogs/api/blog.controller';
 import { PostController } from './features/posts/api/post.controller';
-import { TestingController } from './features/testing/testing.controller';
-import { TestingService } from './features/testing/testing.service';
+import { TestingController } from './features/testing/api/testing.controller';
+import { TestingService } from './features/testing/application/testing.service';
 import { LoginIsExistConstraint } from './infrastructure/decorators/validate/login-is-exist.decorator';
 import { EmailIsExistConstraint } from './infrastructure/decorators/validate/email-is-exist.decorator';
 import { AuthService } from './features/auth/application/auth.service';
@@ -62,8 +62,16 @@ import { UpdatePostLikeUseCase } from './features/posts/application/use-cases/up
 import { LikeStatusUseCase } from './features/comments/application/use-cases/like-status';
 import { RegisterUserUseCase } from './features/auth/application/use-cases/register-user';
 import { CqrsModule } from '@nestjs/cqrs';
+import { UsersModule } from './features/users/users.module';
+import { TestingsModule } from './features/testing/testings.module';
+import { SessionsModule } from './features/sessions/sessions.module';
+import { PostsModule } from './features/posts/posts.module';
+import { CommentsModule } from './features/comments/comments.module';
+import { BlogsModule } from './features/blogs/blogs.module';
+import { AuthModule } from './features/auth/auth.module';
 
-const useCases = [CreateUserUseCase, LikeStatusUseCase, UpdatePostLikeUseCase, RegisterUserUseCase]
+const useCases = [CreateUserUseCase, LikeStatusUseCase, UpdatePostLikeUseCase, RegisterUserUseCase];
+const modules = [UsersModule, TestingsModule, SessionsModule, PostsModule, CommentsModule, BlogsModule, AuthModule];// импортировать! 
 
 @Module({
   imports: [
@@ -131,16 +139,16 @@ const useCases = [CreateUserUseCase, LikeStatusUseCase, UpdatePostLikeUseCase, R
     //   useClass: UserService
     // },
     AppService,
-    TestingService,
+    TestingService,//-
     LocalStrategy, JwtStrategy, BasicStrategy, SoftAuthGuard, CheckTokenAuthGuard,
     LoginIsExistConstraint, EmailIsExistConstraint, BlogIsExistConstraint,
-    UserService, UserQueryRepository, UserRepository,
+    UserService, UserQueryRepository, UserRepository,//-
     BcryptService, EmailService, JwtService,
-    CommentService, CommentQueryRepository, CommentRepository,
-    BlogService, BlogRepository, BlogQueryRepository,
-    PostService, PostRepository, PostQueryRepository,
-    AuthService, AuthRepository, AuthQueryRepository,
-    SessionsService, SessionRepository, SessionsQueryRepository,
+    CommentService, CommentQueryRepository, CommentRepository,//-
+    BlogService, BlogRepository, BlogQueryRepository,//-
+    PostService, PostRepository, PostQueryRepository,//-
+    AuthService, AuthRepository, AuthQueryRepository,//-
+    SessionsService, SessionRepository, SessionsQueryRepository,//-
     ...useCases],
 })
 export class AppModule {}

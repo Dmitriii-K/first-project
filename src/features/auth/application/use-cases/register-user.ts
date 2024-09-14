@@ -17,13 +17,14 @@ export class RegisterUserUseCase {
     async execute(body: UserInputModel) {
         const checkUser = await this.authRepository.checkUserByRegistration(body.login, body.email);
         if (checkUser !== null) return;
-        const password = await this.createHashPassword(body.password);
+        const password = await this.bcryptService.createHashPassword(body.password);
+        // const password = await this.createHashPassword(body.password);
         const newUserForRegistration: User = User.createUserForRegistration(body.login, password, body.email);
         await this.authRepository.createUser(newUserForRegistration); // сохранить юзера в базе данных
         this.emailService.sendMail(newUserForRegistration.email, newUserForRegistration.emailConfirmation.confirmationCode);
         return newUserForRegistration;
     }
-    private createHashPassword(body: UserInputModel) {
+    private createHashPassword(body: UserInputModel) { // надо ли подобное дробление?
         this.bcryptService.createHashPassword(body.password);
     }
     private sendEmail() {
