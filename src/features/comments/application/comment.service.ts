@@ -11,7 +11,7 @@ import { MeViewModel } from "src/features/auth/api/models/output.model";
 
 @Injectable()
 export class CommentService /*implements ICommentService*/{
-    constructor(protected commentRepository: CommentRepository) {}
+    constructor(private commentRepository: CommentRepository) {}
 
     async findUserByComment(id: string) {
         const user = await this.commentRepository.findUserByComment(id);
@@ -29,44 +29,44 @@ export class CommentService /*implements ICommentService*/{
             return false;
         }
     }
-    async likeStatus(user: MeViewModel, data: likeStatus, comment: CommentViewModel) {
-        const existLike = await this.commentRepository.findLike(comment.id, user.userId);
-        if (!existLike) {
-            const newLike: Like = Like.createLike(comment.id, user.userId, user.login, data);
-            if (data === likeStatus.Like) {
-                comment.likesInfo.likesCount++;
-            } else if (data === likeStatus.Dislike) {
-                comment.likesInfo.dislikesCount++;
-            }
-            await this.commentRepository.insertLike(newLike);
-            await this.commentRepository.updateLikesInfo(comment.id, comment.likesInfo.likesCount, comment.likesInfo.dislikesCount);
-            return true;
-        } else {
-            if (existLike.status !== data) {
-                // Обновление счетчиков лайков и дизлайков
-                if (existLike.status === likeStatus.Like && data === likeStatus.Dislike) {
-                    comment.likesInfo.likesCount--;
-                    comment.likesInfo.dislikesCount++;
-                } else if (existLike.status === likeStatus.Dislike && data === likeStatus.Like) {
-                    comment.likesInfo.dislikesCount--;
-                    comment.likesInfo.likesCount++;
-                } else if (existLike.status === likeStatus.Like && data === likeStatus.None) {
-                    comment.likesInfo.likesCount--;
-                } else if (existLike.status === likeStatus.Dislike && data === likeStatus.None) {
-                    comment.likesInfo.dislikesCount--;
-                } else if (existLike.status === likeStatus.None && data === likeStatus.Like) {
-                    comment.likesInfo.likesCount++;
-                } else if (existLike.status === likeStatus.None && data === likeStatus.Dislike) {
-                    comment.likesInfo.dislikesCount++;
-                }
-                existLike.status = data;
-                await this.commentRepository.updateLikeStatus(comment.id, existLike.status);
-                await this.commentRepository.updateLikesInfo(comment.id, comment.likesInfo.likesCount, comment.likesInfo.dislikesCount);
-                return true;
-            }
-        }
-        return false;
-    }
+    // async likeStatus(user: MeViewModel, data: likeStatus, comment: CommentViewModel) {
+    //     const existLike = await this.commentRepository.findLike(comment.id, user.userId);
+    //     if (!existLike) {
+    //         const newLike: Like = Like.createLike(comment.id, user.userId, user.login, data);
+    //         if (data === likeStatus.Like) {
+    //             comment.likesInfo.likesCount++;
+    //         } else if (data === likeStatus.Dislike) {
+    //             comment.likesInfo.dislikesCount++;
+    //         }
+    //         await this.commentRepository.insertLike(newLike);
+    //         await this.commentRepository.updateLikesInfo(comment.id, comment.likesInfo.likesCount, comment.likesInfo.dislikesCount);
+    //         return true;
+    //     } else {
+    //         if (existLike.status !== data) {
+    //             // Обновление счетчиков лайков и дизлайков
+    //             if (existLike.status === likeStatus.Like && data === likeStatus.Dislike) {
+    //                 comment.likesInfo.likesCount--;
+    //                 comment.likesInfo.dislikesCount++;
+    //             } else if (existLike.status === likeStatus.Dislike && data === likeStatus.Like) {
+    //                 comment.likesInfo.dislikesCount--;
+    //                 comment.likesInfo.likesCount++;
+    //             } else if (existLike.status === likeStatus.Like && data === likeStatus.None) {
+    //                 comment.likesInfo.likesCount--;
+    //             } else if (existLike.status === likeStatus.Dislike && data === likeStatus.None) {
+    //                 comment.likesInfo.dislikesCount--;
+    //             } else if (existLike.status === likeStatus.None && data === likeStatus.Like) {
+    //                 comment.likesInfo.likesCount++;
+    //             } else if (existLike.status === likeStatus.None && data === likeStatus.Dislike) {
+    //                 comment.likesInfo.dislikesCount++;
+    //             }
+    //             existLike.status = data;
+    //             await this.commentRepository.updateLikeStatus(comment.id, existLike.status);
+    //             await this.commentRepository.updateLikesInfo(comment.id, comment.likesInfo.likesCount, comment.likesInfo.dislikesCount);
+    //             return true;
+    //         }
+    //     }
+    //     return false;
+    // }
     async deleteComment(id: string) {
         const deleteResult = await this.commentRepository.deleteComment(id);
         if (deleteResult) {

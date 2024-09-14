@@ -12,6 +12,7 @@ import { JwtAuthGuard } from "src/infrastructure/guards/jwt-auth.guard";
 import { SkipThrottle, Throttle, ThrottlerGuard } from "@nestjs/throttler";
 import { BearerAuthGuard } from "src/infrastructure/guards/dubl-guards/bearer-auth.guard";
 import { CheckTokenAuthGuard } from "src/infrastructure/guards/dubl-guards/check-refresh-token.guard";
+import { RegisterUserUseCase } from "../application/use-cases/register-user";
 
 @UseGuards(ThrottlerGuard)
 @Controller('auth')
@@ -20,7 +21,8 @@ export class AuthController{
         protected authService: AuthService,
         protected authRepository: AuthRepository,
         protected bcryptService: BcryptService,
-        protected jwtService: JwtService
+        protected jwtService: JwtService,
+        protected registerUserUseCase: RegisterUserUseCase,
     ) {}
 
     @UseGuards(LocalAuthGuard)
@@ -79,6 +81,7 @@ export class AuthController{
     @HttpCode(204)
     async authRegistration(@Body() body: UserInputModel) {
         const registrationResult = await this.authService.registerUser(body);
+        // const registrationResult = await this.registerUserUseCase.execute(body);
         if(!registrationResult) {
             throw new BadRequestException();
         }

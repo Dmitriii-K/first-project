@@ -9,13 +9,15 @@ import { likeStatus, LikeStatusDto } from "src/features/likes/api/models/input.m
 import { JwtAuthGuard } from "src/infrastructure/guards/jwt-auth.guard";
 import { MeViewModel } from "src/features/auth/api/models/output.model";
 import { SoftAuthGuard } from "src/infrastructure/guards/dubl-guards/soft-auth.guard";
+import { LikeStatusUseCase } from "../application/use-cases/like-status";
 
 
 @Controller('comments')
 export class CommentController {
     constructor(
-        protected commentQueryRepository: CommentQueryRepository,
-        protected commentService: CommentService,
+        private commentQueryRepository: CommentQueryRepository,
+        private commentService: CommentService,
+        private likeStatusUseCase: LikeStatusUseCase
     ) {}
     
     @UseGuards(JwtAuthGuard)
@@ -31,7 +33,7 @@ export class CommentController {
             if (!comment || !user) {
                 throw new NotFoundException();
             }
-            const result = await this.commentService.likeStatus(user, body.likeStatus, comment);
+            const result = await this.likeStatusUseCase.execute(user, body.likeStatus, comment);
             return result;
     }
 

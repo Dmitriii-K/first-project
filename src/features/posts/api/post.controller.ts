@@ -11,14 +11,16 @@ import { CommentInputModel } from "src/features/comments/api/models/input.model"
 import { BasicAuthGuard } from "src/infrastructure/guards/basic.guard";
 import { JwtAuthGuard } from "src/infrastructure/guards/jwt-auth.guard";
 import { SoftAuthGuard } from "src/infrastructure/guards/dubl-guards/soft-auth.guard";
+import { UpdatePostLikeUseCase } from "../application/use-cases/update-post-like";
 
 
 @Controller('posts')
 export class PostController {
     constructor(
-        protected postService: PostService,
-        protected postQueryRepository: PostQueryRepository,
-        protected postRepository: PostRepository,
+        private postService: PostService,
+        private postQueryRepository: PostQueryRepository,
+        private postRepository: PostRepository,
+        private updatePostLikeUseCase: UpdatePostLikeUseCase,
     ) {}
 
     @UseGuards(JwtAuthGuard)
@@ -35,7 +37,7 @@ export class PostController {
         if (!post || !user) {
             throw new NotFoundException();
             }
-        const result = await this.postService.updatePostLike(user, body.likeStatus, post);
+        const result = await this.updatePostLikeUseCase.execute(user, body.likeStatus, post);
         return result;
     }
 
