@@ -6,13 +6,17 @@ import { UserService } from "../application/user.service";
 import { UserQueryRepository } from "../repository/user.query-repository";
 import { BasicAuthGuard } from "src/infrastructure/guards/basic.guard";
 import { BasicGuard } from "src/infrastructure/guards/dubl-guards/basic-auth.guard";
+import { CreateUserCommand, CreateUserUseCase } from "../application/use-cases/create-user";
+import { CommandBus } from "@nestjs/cqrs";
 
 @Controller('users')
 @UseGuards(BasicAuthGuard)
 export class UserController {
     constructor(
         protected userService: UserService,
-        protected userQueryRepository: UserQueryRepository) {}
+        protected userQueryRepository: UserQueryRepository,
+        private commandBus: CommandBus,
+        /*private createUserUseCase: CreateUserUseCase*/) {}
 
     @Get()
     async getUsers(@Query() query: TypeUserPagination) {
@@ -21,7 +25,9 @@ export class UserController {
     }
     @Post()
     async createUser(@Body() body: UserInputModel) {
-        const createResult = await this.userService.createUser(body);
+        // const createResult = await this.userService.createUser(body);
+        // const createResult = await this.createUserUseCase.execute(body);
+        const createResult = await this.commandBus.execute(new CreateUserCommand(body));
         if (!createResult) {
             throw new BadRequestException({ errorsMessages: [{ message: 'email and login should be unique', field: 'email and login' }] })
         }

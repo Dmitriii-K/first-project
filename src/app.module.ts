@@ -57,10 +57,17 @@ import { SoftAuthGuard } from './infrastructure/guards/dubl-guards/soft-auth.gua
 import { CheckTokenAuthGuard } from './infrastructure/guards/dubl-guards/check-refresh-token.guard';
 import configuration, { ConfigurationType, Environments } from './settings/configuration';
 import { validate } from './settings/env/configuration';
+import { CreateUserUseCase } from './features/users/application/use-cases/create-user';
+import { UpdatePostLikeUseCase } from './features/posts/application/use-cases/update-post-like';
+import { LikeStatusUseCase } from './features/comments/application/use-cases/like-status';
+import { RegisterUserUseCase } from './features/auth/application/use-cases/register-user';
+import { CqrsModule } from '@nestjs/cqrs';
 
+const useCases = [CreateUserUseCase, LikeStatusUseCase, UpdatePostLikeUseCase, RegisterUserUseCase]
 
 @Module({
   imports: [
+    CqrsModule,
     MongooseModule.forRootAsync({
       useFactory: (configService: ConfigService<ConfigurationType, true>) => {
         const environmentSettings = configService.get('environmentSettings', {infer: true,});
@@ -109,7 +116,8 @@ import { validate } from './settings/env/configuration';
 
     }),
   ],
-  controllers: [AppController,
+  controllers: [
+    AppController,
     UserController,
     CommentController,
     BlogController,
@@ -132,6 +140,7 @@ import { validate } from './settings/env/configuration';
     BlogService, BlogRepository, BlogQueryRepository,
     PostService, PostRepository, PostQueryRepository,
     AuthService, AuthRepository, AuthQueryRepository,
-    SessionsService, SessionRepository, SessionsQueryRepository],
+    SessionsService, SessionRepository, SessionsQueryRepository,
+    ...useCases],
 })
 export class AppModule {}
