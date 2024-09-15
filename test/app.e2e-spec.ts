@@ -4,23 +4,31 @@ import request from 'supertest';
 import { AppModule } from './../src/app.module';
 
 describe('AppController (e2e)', () => {
-  let server: INestApplication;
-  let app: any
+  let app: INestApplication;
+  let httpServer: any
 
   beforeEach(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [AppModule],
     }).compile();
 
-    server = moduleFixture.createNestApplication();
-    await server.init();
-    app = server.getHttpServer()
+    app = moduleFixture.createNestApplication();
+    await app.init();
+    httpServer = app.getHttpServer()
   });
 
   it('/ (GET)', () => {
-    return request(app)
+    return request(httpServer)
       .get('/')
       .expect(200)
       .expect('Hello World!');
   });
 });
+
+// const moduleFixture: TestingModule = await Test.createTestingModule({
+//   imports: [AppModule],
+// })
+//   .overrideProvider(UsersService)
+//   //.useValue(UserServiceMockObject)
+//   .useClass(UserServiceMock)
+//   .compile();

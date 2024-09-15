@@ -15,15 +15,14 @@ const getConfig = (
 ) => {
     return {
     apiSettings: {
-        PORT: Number.parseInt(environmentVariables.PORT || '3000'),
-        LOCAL_HOST: environmentVariables.LOCAL_HOST || 'http://localhost:3007',
+        PORT: Number.parseInt(environmentVariables.PORT || '3003'),
+        LOCAL_HOST: environmentVariables.LOCAL_HOST || 'http://localhost:3007', //"mongodb://0.0.0.0:27017" ???
         PUBLIC_FRIEND_FRONT_URL: environmentVariables.PUBLIC_FRIEND_FRONT_URL,
     },
 
     databaseSettings: {
         MONGO_CONNECTION_URI: environmentVariables.MONGO_CONNECTION_URI,
-        MONGO_CONNECTION_URI_FOR_TESTS:
-        environmentVariables.MONGO_CONNECTION_URI_FOR_TESTS,
+        MONGO_CONNECTION_URI_FOR_TESTS: environmentVariables.MONGO_CONNECTION_URI_FOR_TESTS
     },
 
     environmentSettings: {
@@ -33,8 +32,18 @@ const getConfig = (
         isTesting: currentEnvironment === Environments.TEST,
         isDevelopment: currentEnvironment === Environments.DEVELOPMENT,
     },
+
     nodemailerSettings: {
         PASSWORD_BY_EMAIL: environmentVariables.PASSWORD_BY_EMAIL
+    },
+
+    jwtSecurity: {
+        JWT_SECRET_KEY: environmentVariables.JWT_SECRET_KEY
+    },
+
+    basicAuth: {
+        ADMIN_NAME: environmentVariables.ADMIN_NAME,
+        ADMIN_PASS: environmentVariables.ADMIN_PASS
     }
     };
 };

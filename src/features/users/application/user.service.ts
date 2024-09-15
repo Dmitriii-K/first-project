@@ -10,7 +10,7 @@ import { UserRepository } from "../repository/user.repository";
 export class UserService /*implements IUserService*/{
     constructor(
         private userRepository: UserRepository,
-        private bcryptService: BcryptService) {}
+        /*private bcryptService: BcryptService*/) {}
 
     // async createUser(data: UserInputModel) {
     //     const userExist = await this.userRepository.findUserByLogiOrEmail({ login: data.login, email: data.email });
