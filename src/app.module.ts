@@ -48,7 +48,6 @@ import { JwtAuthGuard } from './infrastructure/guards/jwt-auth.guard';
 import { BasicStrategy } from './infrastructure/pasport-strategy/basic.strategy';
 import { PassportModule } from '@nestjs/passport';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { SETTINGSFUNCTION } from './settings/app-setting-function';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
 import { Like, LikesSchema } from './features/likes/domain/likes.entity';
@@ -80,7 +79,7 @@ const modules = [UsersModule, TestingsModule, SessionsModule, PostsModule, Comme
       useFactory: (configService: ConfigService<ConfigurationType, true>) => {
         const environmentSettings = configService.get('environmentSettings', {infer: true,});
         const databaseSettings = configService.get('databaseSettings', {infer: true,});
-        const uri = environmentSettings.isTesting
+        const uri = environmentSettings.isTesting // для тестов
           ? databaseSettings.MONGO_CONNECTION_URI_FOR_TESTS
           : databaseSettings.MONGO_CONNECTION_URI;
         console.log(uri);
@@ -116,13 +115,7 @@ const modules = [UsersModule, TestingsModule, SessionsModule, PostsModule, Comme
       process.env.ENV !== Environments.DEVELOPMENT &&
       process.env.ENV !== Environments.TEST,
       envFilePath: ['.env.development.local', '.env.development', '.env']
-    }),
-    ConfigModule.forRoot({
-    isGlobal: true,
-    load: [configuration],
-    validate: validate,
-
-    }),
+    })
   ],
   controllers: [
     AppController,
