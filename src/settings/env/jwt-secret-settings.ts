@@ -1,8 +1,8 @@
 import { IsNumber } from "class-validator";
 import { EnvironmentVariable } from "../configuration";
 
-export class ApiSettings {
+export class JwtSecretSettings {
     constructor(private environmentVariables: EnvironmentVariable) {}
     @IsNumber()
-    PORT: number = Number(this.environmentVariables.PORT);
+    JWT_SECRET_KEY: number = Number(this.environmentVariables.JWT_SECRET_KEY);
 }

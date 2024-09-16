@@ -8,7 +8,7 @@ import { Session, SessionModelType } from "src/features/sessions/domain/session.
 @Injectable()
 export class AuthRepository{
     constructor(
-        @InjectModel(ApiInfo.name) private apiModel: ApiInfoModelType,
+        // @InjectModel(ApiInfo.name) private apiModel: ApiInfoModelType,
         @InjectModel(Session.name) private sessionModel: SessionModelType,
         @InjectModel(User.name) private userModel: UserModelType,
     ) {}

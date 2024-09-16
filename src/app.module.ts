@@ -70,7 +70,7 @@ import { BlogsModule } from './features/blogs/blogs.module';
 import { AuthModule } from './features/auth/auth.module';
 
 const useCases = [CreateUserUseCase, LikeStatusUseCase, UpdatePostLikeUseCase, RegisterUserUseCase];
-const modules = [UsersModule, TestingsModule, SessionsModule, PostsModule, CommentsModule, BlogsModule, AuthModule];// импортировать! 
+const modules = [UsersModule, TestingsModule, SessionsModule, AuthModule];// импортировать! 
 
 @Module({
   imports: [
@@ -89,17 +89,17 @@ const modules = [UsersModule, TestingsModule, SessionsModule, PostsModule, Comme
     }),
     // MongooseModule.forRoot(SETTINGS.MONGO_URL),
     MongooseModule.forFeature([
-      { name: User.name, schema: UserSchema },
+      { name: User.name, schema: UserSchema },//-
       { name: Comment.name, schema: CommentSchema },
       { name: Blog.name, schema: BlogSchema },
       { name: Post.name, schema: PostSchema },
-      { name: Session.name, schema: SessionSchema },
-      { name: ApiInfo.name, schema: ApiSchema },
+      { name: Session.name, schema: SessionSchema },//-
+      { name: ApiInfo.name, schema: ApiSchema },//-
       { name: Like.name, schema: LikesSchema },
     ]),
     JwtModule.register({
       global: true,
-      secret: SETTINGS.JWT_SECRET_KEY,
+      secret: SETTINGS.JWT_SECRET_KEY,// Как правильно заменить ???
       signOptions: { expiresIn: '10s' },
     }),
     ThrottlerModule.forRoot([{
@@ -119,13 +119,14 @@ const modules = [UsersModule, TestingsModule, SessionsModule, PostsModule, Comme
   ],
   controllers: [
     AppController,
-    UserController,
+    UserController,//-
     CommentController,
     BlogController,
     PostController,
-    TestingController,
-    AuthController,
-    SessionController],
+    TestingController,//-
+    AuthController,//-
+    SessionController//-
+  ],
   providers: [
     // {
     //   provide: Types.IUserService,
@@ -137,9 +138,9 @@ const modules = [UsersModule, TestingsModule, SessionsModule, PostsModule, Comme
     LoginIsExistConstraint, EmailIsExistConstraint, BlogIsExistConstraint,
     UserService, UserQueryRepository, UserRepository,//-
     BcryptService, EmailService, JwtService,
-    CommentService, CommentQueryRepository, CommentRepository,//-
-    BlogService, BlogRepository, BlogQueryRepository,//-
-    PostService, PostRepository, PostQueryRepository,//-
+    CommentService, CommentQueryRepository, CommentRepository,
+    BlogService, BlogRepository, BlogQueryRepository,
+    PostService, PostRepository, PostQueryRepository,
     AuthService, AuthRepository, AuthQueryRepository,//-
     SessionsService, SessionRepository, SessionsQueryRepository,//-
     ...useCases],

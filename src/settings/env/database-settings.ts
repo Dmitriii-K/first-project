@@ -4,5 +4,5 @@ import { EnvironmentVariable } from "../configuration";
 export class DatabaseSettings {
     constructor(private environmentVariables: EnvironmentVariable) {}
     @IsString()
-    DB_URL: string | undefined = this.environmentVariables.DB_URL;
+    MONGO_CONNECTION_URI: string | undefined = this.environmentVariables.MONGO_CONNECTION_URI;
 }
