@@ -4,7 +4,7 @@ import { TestingService } from "./application/testing.service";
 
 
 @Module({
-    imports: [],
+    imports: [],// нужно ли импортировать модели и сущности ???
     controllers: [TestingController],
     providers: [TestingService],
 })

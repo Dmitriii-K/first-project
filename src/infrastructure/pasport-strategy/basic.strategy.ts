@@ -17,6 +17,8 @@ export class BasicStrategy extends PassportStrategy(Strategy) {
         const adminName = this.configService.get<string>("ADMIN_NAME");
         const adminPass = this.configService.get<string>("ADMIN_PASS");
 
+        // this.configService.get<string>('basicAuthSettings', {infer: true}) Как внедрить???
+
         if (adminName === username && adminPass === password) {
             return true;
         }

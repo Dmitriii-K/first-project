@@ -37,13 +37,14 @@ const getConfig = (
         PASSWORD_BY_EMAIL: environmentVariables.PASSWORD_BY_EMAIL
     },
 
-    jwtSecurity: {
+    jwtSecuritySettings: {
         JWT_SECRET_KEY: environmentVariables.JWT_SECRET_KEY
     },
 
-    basicAuth: {
+    basicAuthSettings: {
         ADMIN_NAME: environmentVariables.ADMIN_NAME,
         ADMIN_PASS: environmentVariables.ADMIN_PASS
+        // ADMIN: environmentVariables.ADMIN
     }
     };
 };

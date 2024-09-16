@@ -1,14 +1,6 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { SETTINGS } from './settings/app-settings';
-import { BadRequestException, ValidationPipe } from '@nestjs/common';
-import { HttpExceptionFilter } from './infrastructure/exception-filters/exception-filtrs';
-import { OutputErrorsType } from './base/types/output-errors.types';
-import { useContainer } from 'class-validator';
-import { HttpExceptionFilterTest } from './infrastructure/exception-filters/exp-filtr-test';
-import cookieParser from "cookie-parser"
 import { ConfigService } from '@nestjs/config';
-import { ConfigurationType } from './settings/configuration';
 import { appUse } from './app-use';
 
 async function bootstrap() {
@@ -39,30 +31,11 @@ async function bootstrap() {
   // }));//-
   // app.useGlobalFilters(new HttpExceptionFilterTest());//-
 
-  // const configService = app.get(ConfigService);
-  // const port = configService.get<number>('PORT');
-  // await app.listen(port);
-  await app.listen(SETTINGS.PORT);
+  const configService = app.get(ConfigService);
+  const port = configService.get('apiSettings', {infer: true,});
+  await app.listen(port);
+  // await app.listen(SETTINGS.PORT);
 }
-
-// async function bootstrap() {
-//   const app = await NestFactory.create(AppModule);
-
-//   applyAppSettings(app);
-
-//   const configService = app.get(ConfigService<ConfigurationType, true>);
-//   const apiSettings = configService.get('apiSettings', { infer: true });
-//   const environmentSettings = configService.get('environmentSettings', {
-//     infer: true,
-//   });
-//   const port = apiSettings.PORT;
-
-//   await app.listen(port, () => {
-//     console.log('App starting listen port: ', port);
-//     console.log('ENV: ', environmentSettings.currentEnv);
-//   });
-// }
-
 bootstrap();
 
 // "test:e2e": "jest --config ./test/jest-e2e.json"

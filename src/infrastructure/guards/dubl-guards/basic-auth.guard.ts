@@ -21,6 +21,8 @@ export class BasicGuard implements CanActivate {
     // const buff = Buffer.from(auth.slice(6), "base64");
     // const decodedAuth = buff.toString("utf8");
 
+    // const admin = this.configService.get<string>('basicAuthSettings', {infer: true}); Как заменить ???
+    // const buff2 = Buffer.from(admin, "utf8");
     const buff2 = Buffer.from(SETTINGS.ADMIN, "utf8");
     const codedAuth = buff2.toString("base64");
 
