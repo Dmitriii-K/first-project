@@ -3,10 +3,16 @@ import { CommentRepository } from "src/features/comments/repository/comment.repo
 import { PostRepository } from "../../repository/post.repository";
 import { Post, PostDocument } from "../../domain/post.entity";
 import { MeViewModel } from "src/features/auth/api/models/output.model";
-import { likeStatus } from "src/features/likes/api/models/input.model";
+import { likeStatus, LikeStatusDto } from "src/features/likes/api/models/input.model";
 import { Like } from "src/features/likes/domain/likes.entity";
 import {WithId} from "mongodb"
+import { CommandHandler } from "@nestjs/cqrs";
 
+// export class UpdatePostLikeCommand {
+//     constructor(public body: LikeStatusDto) {}
+// }
+
+// @CommandHandler(UpdatePostLikeCommand)
 @Injectable()
 export class UpdatePostLikeUseCase {
     constructor(
@@ -14,37 +20,37 @@ export class UpdatePostLikeUseCase {
         private commentRepository: CommentRepository
     ) {}
 
-    async execute(user: MeViewModel, data: likeStatus, post: WithId<Post>) {
+    async execute(user: MeViewModel, body: likeStatus, post: WithId<Post>) {
         const existLike = await this.commentRepository.findLike(post._id.toString(), user.userId);
         if (!existLike) {
-            const newLike: Like = Like.createLike(post._id.toString(), user.userId, user.login, data);
-            if (data === likeStatus.Like) {
+            const newLike: Like = Like.createLike(post._id.toString(), user.userId, user.login, body);
+            if (body === likeStatus.Like) {
                 post.extendedLikesInfo.likesCount++;
-            } else if (data === likeStatus.Dislike) {
+            } else if (body === likeStatus.Dislike) {
                 post.extendedLikesInfo.dislikesCount++;
             }
             await this.commentRepository.insertLike(newLike);
             await this.postRepository.updatePostCount(post._id.toString(), post.extendedLikesInfo.likesCount, post.extendedLikesInfo.dislikesCount);
             return true;
         } else {
-            if (existLike.status !== data) {
+            if (existLike.status !== body) {
                 // Обновление счетчиков лайков и дизлайков
-                if (existLike.status === likeStatus.Like && data === likeStatus.Dislike) {
+                if (existLike.status === likeStatus.Like && body === likeStatus.Dislike) {
                     post.extendedLikesInfo.likesCount--;
                     post.extendedLikesInfo.dislikesCount++;
-                } else if (existLike.status === likeStatus.Dislike && data === likeStatus.Like) {
+                } else if (existLike.status === likeStatus.Dislike && body === likeStatus.Like) {
                     post.extendedLikesInfo.dislikesCount--;
                     post.extendedLikesInfo.likesCount++;
-                } else if (existLike.status === likeStatus.Like && data === likeStatus.None) {
+                } else if (existLike.status === likeStatus.Like && body === likeStatus.None) {
                     post.extendedLikesInfo.likesCount--;
-                } else if (existLike.status === likeStatus.Dislike && data === likeStatus.None) {
+                } else if (existLike.status === likeStatus.Dislike && body === likeStatus.None) {
                     post.extendedLikesInfo.dislikesCount--;
-                } else if (existLike.status === likeStatus.None && data === likeStatus.Like) {
+                } else if (existLike.status === likeStatus.None && body === likeStatus.Like) {
                     post.extendedLikesInfo.likesCount++;
-                } else if (existLike.status === likeStatus.None && data === likeStatus.Dislike) {
+                } else if (existLike.status === likeStatus.None && body === likeStatus.Dislike) {
                     post.extendedLikesInfo.dislikesCount++;
                 }
-                existLike.status = data;
+                existLike.status = body;
                 await this.commentRepository.updateLikeStatus(post._id.toString(), existLike.status);
                 await this.postRepository.updatePostCount(post._id.toString(), post.extendedLikesInfo.likesCount, post.extendedLikesInfo.dislikesCount);
                 return true;

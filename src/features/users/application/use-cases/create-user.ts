@@ -21,13 +21,9 @@ export class CreateUserUseCase /*implements ICommandHandler<CreateUserCommand>*/
         if (userExist) {
             return false;
         }
-        // const userPassword = await this.createHashPassword(command.body.password);
         const userPassword = await this.bcryptService.createHashPassword(command.body.password);
 
         const newUser: User = User.createUser(command.body.login, userPassword, command.body.email);
         return this.userRepository.insertUser(newUser);
-    }
-    private createHashPassword(command: CreateUserCommand) {// надо ли подобное дробление?
-        this.bcryptService.createHashPassword(command.body.password);
     }
 }

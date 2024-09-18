@@ -12,6 +12,7 @@ import { BasicAuthGuard } from "src/infrastructure/guards/basic.guard";
 import { JwtAuthGuard } from "src/infrastructure/guards/jwt-auth.guard";
 import { SoftAuthGuard } from "src/infrastructure/guards/dubl-guards/soft-auth.guard";
 import { UpdatePostLikeUseCase } from "../application/use-cases/update-post-like";
+import { CommandBus } from "@nestjs/cqrs";
 
 
 @Controller('posts')
@@ -20,6 +21,7 @@ export class PostController {
         private postService: PostService,
         private postQueryRepository: PostQueryRepository,
         private postRepository: PostRepository,
+        private commandBus: CommandBus,
         private updatePostLikeUseCase: UpdatePostLikeUseCase,
     ) {}
 

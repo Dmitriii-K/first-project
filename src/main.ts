@@ -2,10 +2,12 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ConfigService } from '@nestjs/config';
 import { appUse } from './app-use';
+import { ConfigurationType } from './settings/configuration';
 
 async function bootstrap() {
   console.log(process.env.PORT)
   const app = await NestFactory.create(AppModule);
+  app.enableCors();
   appUse(app);
 
   // app.enableCors();//-
@@ -31,9 +33,9 @@ async function bootstrap() {
   // }));//-
   // app.useGlobalFilters(new HttpExceptionFilterTest());//-
 
-  const configService = app.get(ConfigService);
-  const port = configService.get('apiSettings', {infer: true,});
-  await app.listen(port);
+  const configService = app.get(ConfigService<ConfigurationType, true>);
+  const apiSettings = configService.get('apiSettings',{infer:true})
+  await app.listen(apiSettings.PORT);
   // await app.listen(SETTINGS.PORT);
 }
 bootstrap();

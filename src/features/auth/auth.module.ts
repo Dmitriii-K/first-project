@@ -8,16 +8,19 @@ import { EmailService } from "src/infrastructure/adapters/sendEmail";
 import { JwtService } from "src/infrastructure/adapters/jwt.service";
 import { MongooseModule } from "@nestjs/mongoose";
 import { ApiInfo, ApiSchema } from "./domain/auth.entity";
+import { Session, SessionSchema } from "../sessions/domain/session.entity";
+import { User, UserSchema } from "../users/domain/user.entity";
 
 
 @Module({
     imports: [
-        MongooseModule.forFeature([{ name: ApiInfo.name, schema: ApiSchema }]),
-        BcryptService,
-        EmailService,
-        JwtService], // SessionModelType, UserModelType ???
+        MongooseModule.forFeature([
+        { name: ApiInfo.name, schema: ApiSchema }, 
+        { name: Session.name, schema: SessionSchema },
+        { name: User.name, schema: UserSchema }]),
+],
     controllers: [AuthController],
-    providers: [AuthService, AuthRepository, AuthQueryRepository],
+    providers: [AuthService, AuthRepository, AuthQueryRepository, BcryptService, EmailService, JwtService],// CommandBus ???
     exports: []
 })
 export class AuthModule {

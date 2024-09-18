@@ -10,6 +10,7 @@ import { JwtAuthGuard } from "src/infrastructure/guards/jwt-auth.guard";
 import { MeViewModel } from "src/features/auth/api/models/output.model";
 import { SoftAuthGuard } from "src/infrastructure/guards/dubl-guards/soft-auth.guard";
 import { LikeStatusUseCase } from "../application/use-cases/like-status";
+import { CommandBus } from "@nestjs/cqrs";
 
 
 @Controller('comments')
@@ -17,6 +18,7 @@ export class CommentController {
     constructor(
         private commentQueryRepository: CommentQueryRepository,
         private commentService: CommentService,
+        private commandBus: CommandBus,
         private likeStatusUseCase: LikeStatusUseCase
     ) {}
     

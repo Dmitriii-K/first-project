@@ -12,7 +12,7 @@ export class EmailService /*implements IEmailService*/ {
             service: "gmail",
             auth: {
                 user: "hometaskincubator@gmail.com",
-                pass: this.configService.get<string>('nodemailerSettings', {infer: true}), //SETTINGS.PASSWORD_BY_EMAIL
+                pass: this.configService.get<string>('nodemailerSettings.PASSWORD_BY_EMAIL', {infer: true}),
             },
         });
     }

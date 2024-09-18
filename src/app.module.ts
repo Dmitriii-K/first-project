@@ -98,9 +98,7 @@ const modules = [UsersModule, TestingsModule, SessionsModule, AuthModule];// и�
       { name: Like.name, schema: LikesSchema },
     ]),
     JwtModule.register({
-      global: true,
-      secret: SETTINGS.JWT_SECRET_KEY,// Как правильно заменить ???
-      signOptions: { expiresIn: '10s' },
+      global: true
     }),
     ThrottlerModule.forRoot([{
       ttl: 10000,
@@ -110,7 +108,7 @@ const modules = [UsersModule, TestingsModule, SessionsModule, AuthModule];// и�
     ConfigModule.forRoot({
       isGlobal: true,
       load: [configuration],
-      validate: validate,// из configuration ?
+      validate: validate,
       ignoreEnvFile:
       process.env.ENV !== Environments.DEVELOPMENT &&
       process.env.ENV !== Environments.TEST,

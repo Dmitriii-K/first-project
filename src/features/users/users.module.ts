@@ -10,8 +10,8 @@ import { User, UserSchema } from "./domain/user.entity";
 @Module({
     imports: [MongooseModule.forFeature([{ name: User.name, schema: UserSchema }])],
     controllers: [UserController],
-    providers: [UserService, UserRepository, UserQueryRepository, BcryptService],// BcryptService нужен ли?
-    exports: [UserService]// в auth нужна UserModelType
+    providers: [UserService, UserRepository, UserQueryRepository, BcryptService], // CommandBus ???
+    exports: []
 })
 export class UsersModule {
 }

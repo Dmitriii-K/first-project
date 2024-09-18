@@ -28,26 +28,26 @@ export class AuthService{
             return null;
         }
     }
-    async registerUser(data: UserInputModel) {
-        const checkUser = await this.authRepository.checkUserByRegistration(data.login, data.email);
-        if (checkUser !== null) return;
-        const password = await this.bcryptService.createHashPassword(data.password); //создать хэш пароля
-        // const newUser: UserDBModel = { // сформировать dto юзера
-        //     login: data.login,
-        //     email: data.email,
-        //     password,
-        //     createdAt: new Date().toString(),
-        //     emailConfirmation: { // доп поля необходимые для подтверждения
-        //         confirmationCode: randomUUID(),
-        //         expirationDate: (add(new Date(), { hours: 1, minutes: 30, })).toISOString(),
-        //         isConfirmed: false
-        //     }
-        // };
-        const newUserForRegistration: User = User.createUserForRegistration(data.login, password, data.email);
-        await this.authRepository.createUser(newUserForRegistration); // сохранить юзера в базе данных
-        this.emailService.sendMail(newUserForRegistration.email, newUserForRegistration.emailConfirmation.confirmationCode);
-        return newUserForRegistration;
-    }
+    // async registerUser(data: UserInputModel) {
+    //     const checkUser = await this.authRepository.checkUserByRegistration(data.login, data.email);
+    //     if (checkUser !== null) return;
+    //     const password = await this.bcryptService.createHashPassword(data.password); //создать хэш пароля
+    //     // const newUser: UserDBModel = { // сформировать dto юзера
+    //     //     login: data.login,
+    //     //     email: data.email,
+    //     //     password,
+    //     //     createdAt: new Date().toString(),
+    //     //     emailConfirmation: { // доп поля необходимые для подтверждения
+    //     //         confirmationCode: randomUUID(),
+    //     //         expirationDate: (add(new Date(), { hours: 1, minutes: 30, })).toISOString(),
+    //     //         isConfirmed: false
+    //     //     }
+    //     // };
+    //     const newUserForRegistration: User = User.createUserForRegistration(data.login, password, data.email);
+    //     await this.authRepository.createUser(newUserForRegistration); // сохранить юзера в базе данных
+    //     this.emailService.sendMail(newUserForRegistration.email, newUserForRegistration.emailConfirmation.confirmationCode);
+    //     return newUserForRegistration;
+    // }
     async updateRefreshToken(user: MeViewModel, deviceId: string) {
         const newPairTokens = this.jwtService.generateToken(user, deviceId);
         const { accessToken, refreshToken } = newPairTokens;
@@ -73,7 +73,7 @@ export class AuthService{
         // };
         const newSession: Session = Session.createSession(userId, deviceId, iat, exp, userAgent, ip);
         await this.authRepository.createSession(newSession);
-    }
+    }//-
     async authLogoutAndDeleteSession(deviceId: string) {
         const deletedSession = await this.authRepository.deleteSession(deviceId);
         if (deletedSession) {
@@ -82,21 +82,21 @@ export class AuthService{
             return false;
         }
     }
-    async newPassword(data: NewPasswordRecoveryInputModel): Promise<boolean> {
-        // Проверяем, существует ли пользователь с таким кодом восстановления
-        const user: UserDocument | null = await this.authRepository.findUserByCode(data.recoveryCode);
-        if (!user) return false; // Пользователь не найден или код недействителен
-        if (user.emailConfirmation.confirmationCode !== data.recoveryCode) return false;
-        // Хешируем новый пароль
-        const password = await this.bcryptService.createHashPassword(data.newPassword);
-        // Обновляем пароль пользователя
-        const result = await this.authRepository.updatePassword(user._id.toString(), password);
-        if (result) {
-            return true;
-        } else {
-            return false;
-        }
-    }
+    // async newPassword(data: NewPasswordRecoveryInputModel): Promise<boolean> {
+    //     // Проверяем, существует ли пользователь с таким кодом восстановления
+    //     const user: UserDocument | null = await this.authRepository.findUserByCode(data.recoveryCode);
+    //     if (!user) return false; // Пользователь не найден или код недействителен
+    //     if (user.emailConfirmation.confirmationCode !== data.recoveryCode) return false;
+    //     // Хешируем новый пароль
+    //     const password = await this.bcryptService.createHashPassword(data.newPassword);
+    //     // Обновляем пароль пользователя
+    //     const result = await this.authRepository.updatePassword(user._id.toString(), password);
+    //     if (result) {
+    //         return true;
+    //     } else {
+    //         return false;
+    //     }
+    // }
     async passwordRecovery(mail: string): Promise<boolean> {
         // Проверяем, существует ли пользователь с таким email
         const user: UserDocument | null = await this.authRepository.findUserByEmail(mail);

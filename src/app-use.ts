@@ -25,6 +25,5 @@ export const appUse = (app: INestApplication) => {
         throw new BadRequestException(errorsForResponse);
         }
     }));
-    app.enableCors();
     app.useGlobalFilters(new HttpExceptionFilterTest());
 }

@@ -15,7 +15,7 @@ import {WithId} from "mongodb"
 export class PostService {
     constructor(
         private postRepository: PostRepository,
-        private commentRepository: CommentRepository
+        // private commentRepository: CommentRepository
     ) {}
 
     async createPost(data: PostInputModel, id: string) {
