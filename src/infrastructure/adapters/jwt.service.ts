@@ -33,13 +33,13 @@ generateToken(user: RequestUserDTO, deviceId?: string): { accessToken: string, r
         login: user.login,
         deviceId: deviceId ?? randomUUID()
     };
-    const optionsAccessToken = {
+    const optionsAccessToken = {// прописать в конфиг по необходимости
         expiresIn: '10s'
     };
     const optionsRefreshToken = {
         expiresIn: '20s'
     };
-    const secretKey = this.configService.get<number>('jwtSecretSettings', {infer: true});
+    const secretKey = this.configService.get<number>('jwtSecretSettings.JWT_SECRET_KEY', {infer: true});
     const accessToken: string = jwt.sign(payload, secretKey, optionsAccessToken);
     const refreshToken: string = jwt.sign(payload, secretKey, optionsRefreshToken);
     return { accessToken, refreshToken };
@@ -47,7 +47,7 @@ generateToken(user: RequestUserDTO, deviceId?: string): { accessToken: string, r
 
 getUserIdByToken(token: string): UnionPayload | null {
     try {
-        const secretKey = this.configService.get<number>('jwtSecretSettings', {infer: true});
+        const secretKey = this.configService.get<number>('jwtSecretSettings.JWT_SECRET_KEY', {infer: true});
         return jwt.verify(token, secretKey) as unknown as UnionPayload;
     } catch (error) {
         // console.log(error, " error")

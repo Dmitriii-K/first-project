@@ -7,6 +7,4 @@ export class BasicAuthSettings {
     ADMIN_NAME: string | undefined = this.environmentVariables.ADMIN_NAME;
     @IsString()
     ADMIN_PASS: string | undefined = this.environmentVariables.ADMIN_PASS;
-    // @IsString()
-    // ADMIN: string | undefined = this.environmentVariables.ADMIN;
 }

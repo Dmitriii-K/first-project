@@ -16,8 +16,6 @@ const getConfig = (
     return {
     apiSettings: {
         PORT: Number.parseInt(environmentVariables.PORT || '3003'),
-        LOCAL_HOST: environmentVariables.LOCAL_HOST || 'http://localhost:3007', //"mongodb://0.0.0.0:27017" ???
-        PUBLIC_FRIEND_FRONT_URL: environmentVariables.PUBLIC_FRIEND_FRONT_URL,
     },
 
     databaseSettings: {
@@ -38,13 +36,13 @@ const getConfig = (
     },
 
     jwtSecuritySettings: {
+        // из сервиса прописать exp если нужно
         JWT_SECRET_KEY: environmentVariables.JWT_SECRET_KEY
     },
 
     basicAuthSettings: {
         ADMIN_NAME: environmentVariables.ADMIN_NAME,
         ADMIN_PASS: environmentVariables.ADMIN_PASS
-        // ADMIN: environmentVariables.ADMIN
     }
     };
 };

@@ -12,7 +12,10 @@ import { JwtAuthGuard } from "src/infrastructure/guards/jwt-auth.guard";
 import { SkipThrottle, Throttle, ThrottlerGuard } from "@nestjs/throttler";
 import { BearerAuthGuard } from "src/infrastructure/guards/dubl-guards/bearer-auth.guard";
 import { CheckTokenAuthGuard } from "src/infrastructure/guards/dubl-guards/check-refresh-token.guard";
-import { RegisterUserUseCase } from "../application/use-cases/register-user";
+import { RegisterUserCommand, RegisterUserUseCase } from "../application/use-cases/register-user";
+import { CommandBus } from "@nestjs/cqrs";
+import { CreateSessionUseCase } from "../application/use-cases/create-session";
+import { NewPasswordCommand } from "../application/use-cases/new-password";
 
 @UseGuards(ThrottlerGuard)
 @Controller('auth')
@@ -22,7 +25,9 @@ export class AuthController{
         protected authRepository: AuthRepository,
         protected bcryptService: BcryptService,
         protected jwtService: JwtService,
-        protected registerUserUseCase: RegisterUserUseCase,
+        private commandBus: CommandBus,
+        private createSessionUseCase: CreateSessionUseCase,
+        // protected registerUserUseCase: RegisterUserUseCase,
     ) {}
 
     @UseGuards(LocalAuthGuard)
@@ -33,6 +38,7 @@ export class AuthController{
         @Req() req: Request) {
             if(!req.user) throw new UnauthorizedException()
             const { accessToken, refreshToken } = this.jwtService.generateToken(req.user);
+            // await this.createSessionUseCase.execute() как правильно расписать?
             await this.authService.createSession(
                 req.user!.userId,
                 refreshToken,
@@ -52,7 +58,8 @@ export class AuthController{
     @Post('new-password')
     @HttpCode(204)
     async authNewPassword(@Body() body: NewPasswordRecoveryInputModel) {
-        const newPassword = await this.authService.newPassword(body);
+        // const newPassword = await this.authService.newPassword(body);
+        const newPassword = await this.commandBus.execute(new NewPasswordCommand(body));
         if(!newPassword) {
             throw new BadRequestException();
         }
@@ -80,8 +87,9 @@ export class AuthController{
     @Post('registration')
     @HttpCode(204)
     async authRegistration(@Body() body: UserInputModel) {
-        const registrationResult = await this.authService.registerUser(body);
+        // const registrationResult = await this.authService.registerUser(body);
         // const registrationResult = await this.registerUserUseCase.execute(body);
+        const registrationResult = await this.commandBus.execute(new RegisterUserCommand(body));
         if(!registrationResult) {
             throw new BadRequestException();
         }

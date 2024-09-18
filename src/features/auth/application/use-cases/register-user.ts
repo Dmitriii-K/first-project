@@ -4,9 +4,13 @@ import { User } from "src/features/users/domain/user.entity";
 import { AuthRepository } from "../../repository/auth.repository";
 import { BcryptService } from "src/infrastructure/adapters/bcrypt";
 import { EmailService } from "src/infrastructure/adapters/sendEmail";
+import { CommandHandler } from "@nestjs/cqrs";
 
+export class RegisterUserCommand {
+    constructor(public body: UserInputModel) {}
+}
 
-@Injectable()
+@CommandHandler(RegisterUserCommand)
 export class RegisterUserUseCase {
     constructor(
         private authRepository: AuthRepository,
@@ -14,23 +18,13 @@ export class RegisterUserUseCase {
         private emailService: EmailService
     ) {}
 
-    async execute(body: UserInputModel) {
-        const checkUser = await this.authRepository.checkUserByRegistration(body.login, body.email);
+    async execute(command: RegisterUserCommand) {
+        const checkUser = await this.authRepository.checkUserByRegistration(command.body.login, command.body.email);
         if (checkUser !== null) return;
-        const password = await this.bcryptService.createHashPassword(body.password);
-        // const password = await this.createHashPassword(body.password);
-        const newUserForRegistration: User = User.createUserForRegistration(body.login, password, body.email);
+        const password = await this.bcryptService.createHashPassword(command.body.password);
+        const newUserForRegistration: User = User.createUserForRegistration(command.body.login, password, command.body.email);
         await this.authRepository.createUser(newUserForRegistration); // сохранить юзера в базе данных
         this.emailService.sendMail(newUserForRegistration.email, newUserForRegistration.emailConfirmation.confirmationCode);
         return newUserForRegistration;
-    }
-    private createHashPassword(body: UserInputModel) { // надо ли подобное дробление?
-        this.bcryptService.createHashPassword(body.password);
-    }
-    private sendEmail() {
-
-    }
-    private controlAuthRepository() {
-        
     }
 }
