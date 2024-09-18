@@ -5,7 +5,7 @@ import { Connection } from 'mongoose';
 import { getConnectionToken } from '@nestjs/mongoose';
 import { deleteAllData } from './delete-all-data';
 import { UsersTestManager } from './users-test-manager';
-import configuration from '../../src/settings/env/configuration';
+import configuration from '../../src/settings/env/configuration-validation';
 import { UserService } from 'src/features/users/application/user.service';
 
 export const initSettings = async (

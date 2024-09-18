@@ -55,7 +55,7 @@ import { BlogIsExistConstraint } from './infrastructure/decorators/validate/blog
 import { SoftAuthGuard } from './infrastructure/guards/dubl-guards/soft-auth.guard';
 import { CheckTokenAuthGuard } from './infrastructure/guards/dubl-guards/check-refresh-token.guard';
 import configuration, { ConfigurationType, Environments } from './settings/configuration';
-import { validate } from './settings/env/configuration';
+import { validate } from './settings/env/configuration-validation';
 import { CreateUserUseCase } from './features/users/application/use-cases/create-user';
 import { UpdatePostLikeUseCase } from './features/posts/application/use-cases/update-post-like';
 import { LikeStatusUseCase } from './features/comments/application/use-cases/like-status';
