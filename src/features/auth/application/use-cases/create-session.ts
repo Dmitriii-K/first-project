@@ -1,4 +1,3 @@
-import { Injectable } from "@nestjs/common";
 import { AuthRepository } from "../../repository/auth.repository";
 import { CommandHandler } from "@nestjs/cqrs";
 import { JwtService } from "src/infrastructure/adapters/jwt.service";
@@ -22,6 +21,7 @@ export class CreateSessionUseCase {
 
     async execute(command: CreateSessionCommand) {
         const {ip, token, userAgent, userId} = command
+        
         const payload = this.jwtService.getUserIdByToken(token);
         let { iat, exp, deviceId } = payload!;
         iat = new Date(iat * 1000).toISOString();// вынести в createSession

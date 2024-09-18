@@ -1,18 +1,19 @@
-import { Body, Controller, Delete, Get, HttpCode, NotFoundException, Param, Post, Put, Query, Req, Res, UseGuards } from "@nestjs/common";
+import { Body, Controller, Delete, Get, HttpCode, NotFoundException, Param, Post, Put, Query, Req, Res, UnauthorizedException, UseGuards } from "@nestjs/common";
 import { PostService } from "../application/post.service";
 import { PostQueryRepository } from "../repository/post.query-repository";
 import { TypePostHalper } from "src/base/types/post.types";
 import { PostInputModel } from "./models/input.model";
 import { PostRepository } from "../repository/post.repository";
-import { likeStatus, LikeStatusDto } from "src/features/likes/api/models/input.model";
-import { Request, RequestHandler, Response } from "express";
-import { MeViewModel } from "src/features/auth/api/models/output.model";
+import { LikeStatusDto } from "src/features/likes/api/models/input.model";
+import { Request, Response } from "express";
 import { CommentInputModel } from "src/features/comments/api/models/input.model";
 import { BasicAuthGuard } from "src/infrastructure/guards/basic.guard";
 import { JwtAuthGuard } from "src/infrastructure/guards/jwt-auth.guard";
 import { SoftAuthGuard } from "src/infrastructure/guards/dubl-guards/soft-auth.guard";
-import { UpdatePostLikeUseCase } from "../application/use-cases/update-post-like";
+import { UpdatePostLikeCommand } from "../application/use-cases/update-post-like";
 import { CommandBus } from "@nestjs/cqrs";
+import { CreatePostCommand } from "../application/use-cases/create-post";
+import { CreateCommentByPostCommand } from "../application/use-cases/create-comment-by-post";
 
 
 @Controller('posts')
@@ -22,7 +23,6 @@ export class PostController {
         private postQueryRepository: PostQueryRepository,
         private postRepository: PostRepository,
         private commandBus: CommandBus,
-        private updatePostLikeUseCase: UpdatePostLikeUseCase,
     ) {}
 
     @UseGuards(JwtAuthGuard)
@@ -39,7 +39,7 @@ export class PostController {
         if (!post || !user) {
             throw new NotFoundException();
             }
-        const result = await this.updatePostLikeUseCase.execute(user, body.likeStatus, post);
+        const result = await this.commandBus.execute(new UpdatePostLikeCommand(user, body.likeStatus, post));
         return result;
     }
 
@@ -67,7 +67,9 @@ export class PostController {
         @Req() req: Request
     ) {
         const user = req.user ? req.user : null;
-        const createResult = await this.postService.createCommentByPost(id, body, user!);
+        if(!user) throw new UnauthorizedException()
+        // const createResult = await this.postService.createCommentByPost(id, body, user!);
+        const createResult = await this.commandBus.execute(new CreateCommentByPostCommand(id, body, user));
         if (!createResult) {
             throw new NotFoundException();
         }
@@ -93,7 +95,8 @@ export class PostController {
         @Res({ passthrough: true }) res: Response,
         @Req() req: Request) {
         const userId: string | null = req.user ? req.user.userId : null;
-        const createResult = await this.postService.createPost(body, body.blogId);
+        // const createResult = await this.postService.createPost(body, body.blogId);
+        const createResult = await this.commandBus.execute(new CreatePostCommand(body, body.blogId));
         if (!createResult) {
             throw new NotFoundException();
         }

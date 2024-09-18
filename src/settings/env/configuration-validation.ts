@@ -5,7 +5,6 @@ import { EnvironmentSettings } from "./env-settings";
 import { JwtSecretSettings } from "./jwt-secret-settings";
 import { BasicAuthSettings } from "./basic-auth-settings";
 import { NodemailerSettings } from "./nodemailer-settings";
-import { log } from "console";
 
 export type EnvironmentVariable = { [key: string]: string };
 export type ConfigurationType = Configuration;

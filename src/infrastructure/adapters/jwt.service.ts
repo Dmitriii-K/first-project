@@ -1,6 +1,4 @@
 import  jwt from 'jsonwebtoken';
-import { SETTINGS } from '../../settings/app-settings';
-import {  WithId } from 'mongodb';
 import { randomUUID } from 'crypto';
 import { Injectable } from '@nestjs/common';
 import { RequestUserDTO } from 'src/features/auth/api/models/input.model';
@@ -48,7 +46,7 @@ generateToken(user: RequestUserDTO, deviceId?: string): { accessToken: string, r
 
 getUserIdByToken(token: string): UnionPayload | null {
     try {
-        const secretKey = this.configService.get<number>('jwtSecretSettings.JWT_SECRET_KEY', {infer: true});
+        const secretKey = this.configService.get<number>('jwtSecretSettings.JWT_SECRET_KEY', {infer: true});// почему number ???
         return jwt.verify(token, secretKey) as unknown as UnionPayload;
     } catch (error) {
         // console.log(error, " error")

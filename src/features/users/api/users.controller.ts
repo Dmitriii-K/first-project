@@ -1,12 +1,11 @@
 import { BadRequestException, Body, Controller, Delete, Get, HttpCode, NotFoundException, Param, Post, Query, UseGuards } from "@nestjs/common";
 import { TypeUserPagination, UserInputModel } from "./models/input.models";
 import { PaginatorUserViewModel, UserViewModel } from "./models/output.models";
-import { IUserQueryRepository, IUserService } from "./models/interface";
 import { UserService } from "../application/user.service";
 import { UserQueryRepository } from "../repository/user.query-repository";
 import { BasicAuthGuard } from "src/infrastructure/guards/basic.guard";
 import { BasicGuard } from "src/infrastructure/guards/dubl-guards/basic-auth.guard";
-import { CreateUserCommand, CreateUserUseCase } from "../application/use-cases/create-user";
+import { CreateUserCommand} from "../application/use-cases/create-user";
 import { CommandBus } from "@nestjs/cqrs";
 
 @Controller('users')
@@ -15,8 +14,7 @@ export class UserController {
     constructor(
         protected userService: UserService,
         protected userQueryRepository: UserQueryRepository,
-        private commandBus: CommandBus,
-        /*private createUserUseCase: CreateUserUseCase*/) {}
+        private commandBus: CommandBus) {}
 
     @Get()
     async getUsers(@Query() query: TypeUserPagination) {

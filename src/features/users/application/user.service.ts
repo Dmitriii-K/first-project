@@ -1,16 +1,9 @@
 import { Injectable } from "@nestjs/common";
-import { UserInputModel } from "../api/models/input.models";
-import { IBcryptService, IUserRepository, IUserService } from "../api/models/interface";
-import { User } from "../domain/user.entity";
-import { BcryptService } from "src/infrastructure/adapters/bcrypt";
 import { UserRepository } from "../repository/user.repository";
-
 
 @Injectable()
 export class UserService /*implements IUserService*/{
-    constructor(
-        private userRepository: UserRepository,
-        /*private bcryptService: BcryptService*/) {}
+    constructor(private userRepository: UserRepository) {}
 
     // async createUser(data: UserInputModel) {
     //     const userExist = await this.userRepository.findUserByLogiOrEmail({ login: data.login, email: data.email });

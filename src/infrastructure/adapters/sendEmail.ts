@@ -1,5 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import { SETTINGS } from '../../settings/app-settings';
 import { ConfigService } from '@nestjs/config';
 import { ConfigurationType } from 'src/settings/configuration';
 const nodemailer = require("nodemailer");

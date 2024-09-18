@@ -1,13 +1,5 @@
 import { Injectable } from "@nestjs/common";
-import { ICommentRepository, ICommentService } from "../api/models/interface";
 import { CommentRepository } from "../repository/comment.repository";
-import { CommentViewModel } from "../api/models/output.model";
-import { User } from "src/features/users/domain/user.entity";
-import { likeStatus } from "src/features/likes/api/models/input.model";
-import {WithId} from "mongodb"
-import { Like } from "src/features/likes/domain/likes.entity";
-import { UserDBModel } from "src/base/types/user.types";
-import { MeViewModel } from "src/features/auth/api/models/output.model";
 
 @Injectable()
 export class CommentService /*implements ICommentService*/{

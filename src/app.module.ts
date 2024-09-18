@@ -8,7 +8,6 @@ import { UserController } from './features/users/api/users.controller';
 import { UserService } from './features/users/application/user.service';
 import { BcryptService } from './infrastructure/adapters/bcrypt';
 import { UserRepository } from './features/users/repository/user.repository';
-import { configFactory, SETTINGS } from './settings/app-settings';
 import { CommentController } from './features/comments/api/comment.controller';
 import { CommentQueryRepository } from './features/comments/repository/comment.query-repository';
 import { CommentRepository } from './features/comments/repository/comment.repository';
@@ -48,13 +47,12 @@ import { JwtAuthGuard } from './infrastructure/guards/jwt-auth.guard';
 import { BasicStrategy } from './infrastructure/pasport-strategy/basic.strategy';
 import { PassportModule } from '@nestjs/passport';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
-import { APP_GUARD } from '@nestjs/core';
+import { ThrottlerModule } from '@nestjs/throttler';
 import { Like, LikesSchema } from './features/likes/domain/likes.entity';
 import { BlogIsExistConstraint } from './infrastructure/decorators/validate/blog-is-exist.decorator';
 import { SoftAuthGuard } from './infrastructure/guards/dubl-guards/soft-auth.guard';
 import { CheckTokenAuthGuard } from './infrastructure/guards/dubl-guards/check-refresh-token.guard';
-import configuration, { ConfigurationType, Environments } from './settings/configuration';
+import configuration, { ConfigurationType } from './settings/configuration';
 import { validate } from './settings/env/configuration-validation';
 import { CreateUserUseCase } from './features/users/application/use-cases/create-user';
 import { UpdatePostLikeUseCase } from './features/posts/application/use-cases/update-post-like';
@@ -64,13 +62,27 @@ import { CqrsModule } from '@nestjs/cqrs';
 import { UsersModule } from './features/users/users.module';
 import { TestingsModule } from './features/testing/testings.module';
 import { SessionsModule } from './features/sessions/sessions.module';
-import { PostsModule } from './features/posts/posts.module';
-import { CommentsModule } from './features/comments/comments.module';
-import { BlogsModule } from './features/blogs/blogs.module';
 import { AuthModule } from './features/auth/auth.module';
 import { CreateSessionUseCase } from './features/auth/application/use-cases/create-session';
+import { ResendEmailUseCase } from './features/auth/application/use-cases/resend-email';
+import { UpdateRefreshTokenUseCase } from './features/auth/application/use-cases/update-refresh-token';
+import { CreateCommentByPostUseCase } from './features/posts/application/use-cases/create-comment-by-post';
+import { CreatePostUseCase } from './features/posts/application/use-cases/create-post';
+import { NewPasswordUseCase } from './features/auth/application/use-cases/new-password';
+import { PasswordRecoveryUseCase } from './features/auth/application/use-cases/password-recovery';
 
-const useCases = [CreateUserUseCase, LikeStatusUseCase, UpdatePostLikeUseCase, RegisterUserUseCase];
+const useCases = [
+  CreateUserUseCase, 
+  LikeStatusUseCase, 
+  UpdatePostLikeUseCase,
+  RegisterUserUseCase, 
+  CreateSessionUseCase, 
+  ResendEmailUseCase, 
+  UpdateRefreshTokenUseCase,
+  CreateCommentByPostUseCase,
+  CreatePostUseCase,
+  NewPasswordUseCase,
+  PasswordRecoveryUseCase];
 const modules = [UsersModule, TestingsModule, AuthModule, SessionsModule];// импортировать! 
 
 @Module({
@@ -110,12 +122,11 @@ const modules = [UsersModule, TestingsModule, AuthModule, SessionsModule];// и�
     JwtModule.registerAsync({
       global: true,
       useFactory:(configService: ConfigService<ConfigurationType, true>) => {
-        const secret = configService.get('jwtSecretSettings.JWT_SECRET_KEY', {infer: true,});
+        const secret = configService.get('jwtSecretSettings.JWT_SECRET_KEY', {infer: true,});// несоответствие типов !!!
         // console.log(secret, " secret")
         return {secret};
       },
       inject:[ConfigService]
-      // secret: process.env.JWT_SECRET_KEY,
     }),
     ThrottlerModule.forRoot([{
       ttl: 10000,
@@ -139,7 +150,6 @@ const modules = [UsersModule, TestingsModule, AuthModule, SessionsModule];// и�
     //   provide: Types.IUserService,
     //   useClass: UserService
     // },
-    CreateSessionUseCase,
     AppService,
     TestingService,//-
     LocalStrategy, JwtStrategy, BasicStrategy, SoftAuthGuard, CheckTokenAuthGuard,

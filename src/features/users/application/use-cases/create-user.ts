@@ -1,10 +1,8 @@
-import { Injectable } from "@nestjs/common";
 import { UserInputModel } from "../../api/models/input.models";
-import { IBcryptService, IUserRepository, IUserService } from "../../api/models/interface";
 import { User } from "../../domain/user.entity";
 import { BcryptService } from "src/infrastructure/adapters/bcrypt";
 import { UserRepository } from "../../repository/user.repository";
-import { CommandHandler, ICommandHandler } from "@nestjs/cqrs";
+import { CommandHandler} from "@nestjs/cqrs";
 
 export class CreateUserCommand {
     constructor(public body: UserInputModel) {}

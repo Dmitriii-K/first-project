@@ -6,17 +6,21 @@ import { CommentRepository } from "../../repository/comment.repository";
 import { CommentViewModel } from "../../api/models/output.model";
 import { CommandHandler } from "@nestjs/cqrs";
 
-// export class LikeStatusCommand {
-//     constructor(public body: LikeStatusDto) {}
-// }
+export class LikeStatusCommand {
+    constructor(
+        public user: MeViewModel,
+        public body: likeStatus,
+        public comment: CommentViewModel,
+    ) {}
+}
 
-// @CommandHandler(LikeStatusCommand)
-
-@Injectable()
+@CommandHandler(LikeStatusCommand)
 export class LikeStatusUseCase {
     constructor(private commentRepository: CommentRepository) {}
 
-    async execute(user: MeViewModel, body: likeStatus, comment: CommentViewModel) {
+    async execute(command: LikeStatusCommand) {
+        const {user, body, comment} = command;
+
         const existLike = await this.commentRepository.findLike(comment.id, user.userId);
         if (!existLike) {
             const newLike: Like = Like.createLike(comment.id, user.userId, user.login, body);
