@@ -58,22 +58,22 @@ export class AuthService{
         await this.authRepository.updateIat(iat, deviceId);
         return { accessToken, refreshToken };
     }
-    async createSession(userId: string, token: string, userAgent: string, ip: string) {
-        const payload = this.jwtService.getUserIdByToken(token);
-        let { iat, exp, deviceId } = payload!;
-        iat = new Date(iat * 1000).toISOString();
-        exp = new Date(exp * 1000).toISOString();
-        // const newSession: Session = {
-        //     user_id: userId,
-        //     device_id: deviceId,
-        //     iat: iat,
-        //     exp: exp,
-        //     device_name: userAgent,
-        //     ip: ip
-        // };
-        const newSession: Session = Session.createSession(userId, deviceId, iat, exp, userAgent, ip);
-        await this.authRepository.createSession(newSession);
-    }//-
+    // async createSession(userId: string, token: string, userAgent: string, ip: string) {
+    //     const payload = this.jwtService.getUserIdByToken(token);
+    //     let { iat, exp, deviceId } = payload!;
+    //     iat = new Date(iat * 1000).toISOString();
+    //     exp = new Date(exp * 1000).toISOString();
+    //     // const newSession: Session = {
+    //     //     user_id: userId,
+    //     //     device_id: deviceId,
+    //     //     iat: iat,
+    //     //     exp: exp,
+    //     //     device_name: userAgent,
+    //     //     ip: ip
+    //     // };
+    //     const newSession: Session = Session.createSession(userId, deviceId, iat, exp, userAgent, ip);
+    //     await this.authRepository.createSession(newSession);
+    // }//-
     async authLogoutAndDeleteSession(deviceId: string) {
         const deletedSession = await this.authRepository.deleteSession(deviceId);
         if (deletedSession) {

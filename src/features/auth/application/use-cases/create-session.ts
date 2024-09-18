@@ -4,19 +4,24 @@ import { CommandHandler } from "@nestjs/cqrs";
 import { JwtService } from "src/infrastructure/adapters/jwt.service";
 import { Session } from "src/features/sessions/domain/session.entity";
 
-// export class CreateSessionCommand {
-//     constructor() {}
-// }
+export class CreateSessionCommand {
+    constructor(
+        public userId: string, 
+        public token: string, 
+        public userAgent: string, 
+        public ip: string
+    ) {}
+}
 
-// @CommandHandler()
-Injectable()
+@CommandHandler(CreateSessionCommand)
 export class CreateSessionUseCase {
     constructor(
         private authRepository: AuthRepository,
         private jwtService: JwtService
     ) {}
 
-    async execute(userId: string, token: string, userAgent: string, ip: string) {
+    async execute(command: CreateSessionCommand) {
+        const {ip, token, userAgent, userId} = command
         const payload = this.jwtService.getUserIdByToken(token);
         let { iat, exp, deviceId } = payload!;
         iat = new Date(iat * 1000).toISOString();// вынести в createSession

@@ -68,13 +68,23 @@ import { PostsModule } from './features/posts/posts.module';
 import { CommentsModule } from './features/comments/comments.module';
 import { BlogsModule } from './features/blogs/blogs.module';
 import { AuthModule } from './features/auth/auth.module';
+import { CreateSessionUseCase } from './features/auth/application/use-cases/create-session';
 
 const useCases = [CreateUserUseCase, LikeStatusUseCase, UpdatePostLikeUseCase, RegisterUserUseCase];
-const modules = [UsersModule, TestingsModule, SessionsModule, AuthModule];// импортировать! 
+const modules = [UsersModule, TestingsModule, AuthModule, SessionsModule];// импортировать! 
 
 @Module({
   imports: [
     CqrsModule,
+    ConfigModule.forRoot({
+      isGlobal: true,
+      load: [configuration],
+      validate: validate,
+      // ignoreEnvFile:
+      // process.env.ENV !== Environments.DEVELOPMENT &&
+      // process.env.ENV !== Environments.TEST,
+      envFilePath: '.env'
+    }),
     MongooseModule.forRootAsync({
       useFactory: (configService: ConfigService<ConfigurationType, true>) => {
         const environmentSettings = configService.get('environmentSettings', {infer: true,});
@@ -82,7 +92,7 @@ const modules = [UsersModule, TestingsModule, SessionsModule, AuthModule];// и�
         const uri = environmentSettings.isTesting // для тестов
           ? databaseSettings.MONGO_CONNECTION_URI_FOR_TESTS
           : databaseSettings.MONGO_CONNECTION_URI;
-        console.log(uri);
+        // console.log(uri);
         return {uri: uri};
       },
       inject: [ConfigService],
@@ -97,23 +107,22 @@ const modules = [UsersModule, TestingsModule, SessionsModule, AuthModule];// и�
       { name: ApiInfo.name, schema: ApiSchema },//-
       { name: Like.name, schema: LikesSchema },
     ]),
-    JwtModule.register({
-      global: true
+    JwtModule.registerAsync({
+      global: true,
+      useFactory:(configService: ConfigService<ConfigurationType, true>) => {
+        const secret = configService.get('jwtSecretSettings.JWT_SECRET_KEY', {infer: true,});
+        // console.log(secret, " secret")
+        return {secret};
+      },
+      inject:[ConfigService]
+      // secret: process.env.JWT_SECRET_KEY,
     }),
     ThrottlerModule.forRoot([{
       ttl: 10000,
       limit: 5,
     }]),
     PassportModule,
-    ConfigModule.forRoot({
-      isGlobal: true,
-      load: [configuration],
-      validate: validate,
-      ignoreEnvFile:
-      process.env.ENV !== Environments.DEVELOPMENT &&
-      process.env.ENV !== Environments.TEST,
-      envFilePath: ['.env.development.local', '.env.development', '.env']
-    })
+    // ...modules
   ],
   controllers: [
     AppController,
@@ -130,6 +139,7 @@ const modules = [UsersModule, TestingsModule, SessionsModule, AuthModule];// и�
     //   provide: Types.IUserService,
     //   useClass: UserService
     // },
+    CreateSessionUseCase,
     AppService,
     TestingService,//-
     LocalStrategy, JwtStrategy, BasicStrategy, SoftAuthGuard, CheckTokenAuthGuard,

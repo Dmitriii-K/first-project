@@ -40,6 +40,7 @@ generateToken(user: RequestUserDTO, deviceId?: string): { accessToken: string, r
         expiresIn: '20s'
     };
     const secretKey = this.configService.get<number>('jwtSecretSettings.JWT_SECRET_KEY', {infer: true});
+    // console.log(secretKey)
     const accessToken: string = jwt.sign(payload, secretKey, optionsAccessToken);
     const refreshToken: string = jwt.sign(payload, secretKey, optionsRefreshToken);
     return { accessToken, refreshToken };

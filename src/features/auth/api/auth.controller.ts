@@ -14,7 +14,7 @@ import { BearerAuthGuard } from "src/infrastructure/guards/dubl-guards/bearer-au
 import { CheckTokenAuthGuard } from "src/infrastructure/guards/dubl-guards/check-refresh-token.guard";
 import { RegisterUserCommand, RegisterUserUseCase } from "../application/use-cases/register-user";
 import { CommandBus } from "@nestjs/cqrs";
-import { CreateSessionUseCase } from "../application/use-cases/create-session";
+import { CreateSessionCommand, CreateSessionUseCase } from "../application/use-cases/create-session";
 import { NewPasswordCommand } from "../application/use-cases/new-password";
 
 @UseGuards(ThrottlerGuard)
@@ -26,7 +26,7 @@ export class AuthController{
         protected bcryptService: BcryptService,
         protected jwtService: JwtService,
         private commandBus: CommandBus,
-        private createSessionUseCase: CreateSessionUseCase,
+        // private createSessionUseCase: CreateSessionUseCase,
         // protected registerUserUseCase: RegisterUserUseCase,
     ) {}
 
@@ -38,12 +38,17 @@ export class AuthController{
         @Req() req: Request) {
             if(!req.user) throw new UnauthorizedException()
             const { accessToken, refreshToken } = this.jwtService.generateToken(req.user);
-            // await this.createSessionUseCase.execute() как правильно расписать?
-            await this.authService.createSession(
+            await this.commandBus.execute(new CreateSessionCommand(
                 req.user!.userId,
                 refreshToken,
                 req.headers["user-agent"] || "unknown",
-                req.ip || "unknown");
+                req.ip || "unknown"
+            )) // как правильно расписать?
+            // await this.authService.createSession(
+            //     req.user!.userId,
+            //     refreshToken,
+            //     req.headers["user-agent"] || "unknown",
+            //     req.ip || "unknown");
 
         res.cookie('refreshToken', refreshToken, { httpOnly: true, secure: true });
         return { accessToken };

@@ -5,7 +5,7 @@ import { appUse } from './app-use';
 import { ConfigurationType } from './settings/configuration';
 
 async function bootstrap() {
-  console.log(process.env.PORT)
+  // console.log(process.env.PORT)
   const app = await NestFactory.create(AppModule);
   app.enableCors();
   appUse(app);
@@ -35,6 +35,7 @@ async function bootstrap() {
 
   const configService = app.get(ConfigService<ConfigurationType, true>);
   const apiSettings = configService.get('apiSettings',{infer:true})
+  console.log(apiSettings.PORT)
   await app.listen(apiSettings.PORT);
   // await app.listen(SETTINGS.PORT);
 }

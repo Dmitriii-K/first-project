@@ -5,6 +5,7 @@ import { EnvironmentSettings } from "./env-settings";
 import { JwtSecretSettings } from "./jwt-secret-settings";
 import { BasicAuthSettings } from "./basic-auth-settings";
 import { NodemailerSettings } from "./nodemailer-settings";
+import { log } from "console";
 
 export type EnvironmentVariable = { [key: string]: string };
 export type ConfigurationType = Configuration;
@@ -52,6 +53,8 @@ static createConfig(
 
 export function validate(environmentVariables: Record<string, string>) {
     const config = Configuration.createConfig(environmentVariables);
+    // console.log("-----", environmentVariables)
+    // console.log(config, " config")
     const errors = validateSync(config, { skipMissingProperties: false });
     if (errors.length > 0) {
     throw new Error(errors.toString());
@@ -61,6 +64,6 @@ export function validate(environmentVariables: Record<string, string>) {
 
 export default () => {
     const environmentVariables = process.env as EnvironmentVariable;
-    console.log('process.env.ENV =', environmentVariables.ENV);
+    // console.log('process.env.ENV =', environmentVariables.ENV);
     return Configuration.createConfig(environmentVariables);
 };

@@ -10,6 +10,10 @@ import { MongooseModule } from "@nestjs/mongoose";
 import { ApiInfo, ApiSchema } from "./domain/auth.entity";
 import { Session, SessionSchema } from "../sessions/domain/session.entity";
 import { User, UserSchema } from "../users/domain/user.entity";
+import { UserService } from "../users/application/user.service";
+import { SessionRepository } from "../sessions/repository/session.repository";
+import { CommandBus } from "@nestjs/cqrs";
+import { UsersModule } from "../users/users.module";
 
 
 @Module({
@@ -18,10 +22,15 @@ import { User, UserSchema } from "../users/domain/user.entity";
         { name: ApiInfo.name, schema: ApiSchema }, 
         { name: Session.name, schema: SessionSchema },
         { name: User.name, schema: UserSchema }]),
+        UsersModule,
 ],
     controllers: [AuthController],
-    providers: [AuthService, AuthRepository, AuthQueryRepository, BcryptService, EmailService, JwtService],// CommandBus ???
-    exports: []
+    providers: [
+    AuthService, 
+    AuthRepository,
+    AuthQueryRepository,
+    BcryptService, EmailService, JwtService, SessionRepository, CommandBus],// CommandBus ???
+    exports: [MongooseModule, AuthService, AuthRepository, AuthQueryRepository, BcryptService, EmailService, JwtService, SessionRepository]
 })
 export class AuthModule {
 }
