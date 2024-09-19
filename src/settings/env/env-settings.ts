@@ -1,9 +1,14 @@
 import { IsEnum } from "class-validator";
 import { Environments, EnvironmentVariable } from "../configuration";
+import { Trim } from "src/infrastructure/decorators/transform/trim";
 
 export class EnvironmentSettings {
-    constructor(private environmentVariables: EnvironmentVariable) {}
+    constructor(private environmentVariables: EnvironmentVariable) {
+        // console.log("++", `|${this.environmentVariables.ENV}|`)
+    }
+    
     @IsEnum(Environments)
+    @Trim()
     private ENV = this.environmentVariables.ENV;
     get isProduction() {
         return this.environmentVariables.ENV === Environments.PRODUCTION;

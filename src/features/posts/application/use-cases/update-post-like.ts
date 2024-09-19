@@ -1,26 +1,30 @@
-import { BadRequestException, Injectable, NotFoundException } from "@nestjs/common";
 import { CommentRepository } from "src/features/comments/repository/comment.repository";
 import { PostRepository } from "../../repository/post.repository";
-import { Post, PostDocument } from "../../domain/post.entity";
+import { Post } from "../../domain/post.entity";
 import { MeViewModel } from "src/features/auth/api/models/output.model";
-import { likeStatus, LikeStatusDto } from "src/features/likes/api/models/input.model";
+import { likeStatus } from "src/features/likes/api/models/input.model";
 import { Like } from "src/features/likes/domain/likes.entity";
 import {WithId} from "mongodb"
 import { CommandHandler } from "@nestjs/cqrs";
 
-// export class UpdatePostLikeCommand {
-//     constructor(public body: LikeStatusDto) {}
-// }
+export class UpdatePostLikeCommand {
+    constructor(
+        public user: MeViewModel,
+        public body: likeStatus,
+        public post: WithId<Post>
+        ) {}
+}
 
-// @CommandHandler(UpdatePostLikeCommand)
-@Injectable()
+@CommandHandler(UpdatePostLikeCommand)
 export class UpdatePostLikeUseCase {
     constructor(
         private postRepository: PostRepository,
         private commentRepository: CommentRepository
     ) {}
 
-    async execute(user: MeViewModel, body: likeStatus, post: WithId<Post>) {
+    async execute(command: UpdatePostLikeCommand) {
+        const {user, body, post} = command;
+
         const existLike = await this.commentRepository.findLike(post._id.toString(), user.userId);
         if (!existLike) {
             const newLike: Like = Like.createLike(post._id.toString(), user.userId, user.login, body);

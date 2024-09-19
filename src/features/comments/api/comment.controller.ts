@@ -1,15 +1,13 @@
-import { Body, Controller, Delete, ForbiddenException, Get, HttpCode, NotFoundException, Param, Put, Req, Res, UseGuards } from "@nestjs/common";
+import { Body, Controller, Delete, ForbiddenException, Get, HttpCode, NotFoundException, Param, Put, Req, Res, UnauthorizedException, UseGuards } from "@nestjs/common";
 import { CommentViewModel } from "./models/output.model";
-import { ICommentQueryRepository } from "./models/interface";
 import { CommentQueryRepository } from "../repository/comment.query-repository";
 import { CommentService } from "../application/comment.service";
 import { CommentInputModel } from "./models/input.model";
 import { Request, Response } from "express";
-import { likeStatus, LikeStatusDto } from "src/features/likes/api/models/input.model";
+import { LikeStatusDto } from "src/features/likes/api/models/input.model";
 import { JwtAuthGuard } from "src/infrastructure/guards/jwt-auth.guard";
-import { MeViewModel } from "src/features/auth/api/models/output.model";
 import { SoftAuthGuard } from "src/infrastructure/guards/dubl-guards/soft-auth.guard";
-import { LikeStatusUseCase } from "../application/use-cases/like-status";
+import { LikeStatusCommand } from "../application/use-cases/like-status";
 import { CommandBus } from "@nestjs/cqrs";
 
 
@@ -18,8 +16,7 @@ export class CommentController {
     constructor(
         private commentQueryRepository: CommentQueryRepository,
         private commentService: CommentService,
-        private commandBus: CommandBus,
-        private likeStatusUseCase: LikeStatusUseCase
+        private commandBus: CommandBus
     ) {}
     
     @UseGuards(JwtAuthGuard)
@@ -31,11 +28,14 @@ export class CommentController {
         @Res({ passthrough: true }) res: Response,
         @Req() req: Request) {
             const user = req.user ? req.user : null;
-            const comment = await this.commentQueryRepository.findCommentById(id, user!.userId);
+            if(!user) throw new UnauthorizedException()
+                
+            const comment = await this.commentQueryRepository.findCommentById(id, user.userId);
             if (!comment || !user) {
                 throw new NotFoundException();
             }
-            const result = await this.likeStatusUseCase.execute(user, body.likeStatus, comment);
+            // const result = await this.likeStatusUseCase.execute(user, body.likeStatus, comment);
+            const result = await this.commandBus.execute(new LikeStatusCommand(user, body.likeStatus, comment));
             return result;
     }
 

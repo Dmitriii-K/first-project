@@ -8,9 +8,11 @@ import { SessionRepository } from 'src/features/sessions/repository/session.repo
 @Injectable()
 export class CheckTokenAuthGuard implements CanActivate {
     constructor(
-        protected userRepository: UserRepository,
+        
         protected sessionsRepository: SessionRepository,
-        protected jwtService: JwtService,) {}
+        protected jwtService: JwtService,
+        protected userRepository: UserRepository,
+        ) {}
 
     async canActivate(
     context: ExecutionContext,

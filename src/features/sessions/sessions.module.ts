@@ -12,5 +12,4 @@ import { Session, SessionSchema } from "./domain/session.entity";
     providers: [SessionsService, SessionRepository, SessionsQueryRepository],
     exports: []
 })
-export class SessionsModule {
-}
+export class SessionsModule {}

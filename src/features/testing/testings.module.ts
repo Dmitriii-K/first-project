@@ -12,7 +12,7 @@ import { Like, LikesSchema } from "../likes/domain/likes.entity";
 
 
 @Module({
-    imports: [ MongooseModule.forFeature([
+    imports:  [ MongooseModule.forFeature([
         { name: User.name, schema: UserSchema },
         { name: Comment.name, schema: CommentSchema },
         { name: Blog.name, schema: BlogSchema },
@@ -20,9 +20,10 @@ import { Like, LikesSchema } from "../likes/domain/likes.entity";
         { name: Session.name, schema: SessionSchema },
         { name: ApiInfo.name, schema: ApiSchema },
         { name: Like.name, schema: LikesSchema },
-    ])],// нужно ли импортировать модели и сущности ???
+    ])],
     controllers: [TestingController],
     providers: [TestingService],
+    exports: []
 })
 export class TestingsModule {
 }

@@ -35,7 +35,7 @@ const getConfig = (
         PASSWORD_BY_EMAIL: environmentVariables.PASSWORD_BY_EMAIL
     },
 
-    jwtSecuritySettings: {
+    jwtSecretSettings: {
         // из сервиса прописать exp если нужно
         JWT_SECRET_KEY: environmentVariables.JWT_SECRET_KEY
     },
@@ -50,8 +50,8 @@ const getConfig = (
 export default () => {
     const environmentVariables = process.env;
 
-    console.log('process.env.ENV =', environmentVariables.ENV);
+    // console.log('process.env.ENV =', environmentVariables.ENV);
     const currentEnvironment: Environments = environmentVariables.ENV as Environments;
 
-    return getConfig(environmentVariables, currentEnvironment);
+    return getConfig(environmentVariables, (currentEnvironment.toString().trim()) as Environments);
 };

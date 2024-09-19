@@ -1,21 +1,24 @@
-import { BadRequestException, Body, Controller, Get, HttpCode, HttpException, Post, Req, Res, UnauthorizedException, UseGuards } from "@nestjs/common";
+import { BadRequestException, Body, Controller, Get, HttpCode, Post, Req, Res, UnauthorizedException, UseGuards } from "@nestjs/common";
 import { AuthService } from "../application/auth.service";
 import { AuthRepository } from "../repository/auth.repository";
 import { BcryptService } from "src/infrastructure/adapters/bcrypt";
 import { JwtService } from "src/infrastructure/adapters/jwt.service";
-import { LoginInputModel, NewPasswordRecoveryInputModel, RegistrationConfirmationCodeModel, RegistrationEmailResending } from "./models/input.model";
+import { NewPasswordRecoveryInputModel, RegistrationConfirmationCodeModel, RegistrationEmailResending } from "./models/input.model";
 import { UserInputModel } from "src/features/users/api/models/input.models";
 import { Request, Response } from "express";
 import { MeViewModel } from "./models/output.model";
 import { LocalAuthGuard } from "src/infrastructure/guards/local-auth.guard";
 import { JwtAuthGuard } from "src/infrastructure/guards/jwt-auth.guard";
-import { SkipThrottle, Throttle, ThrottlerGuard } from "@nestjs/throttler";
+import { SkipThrottle, ThrottlerGuard } from "@nestjs/throttler";
 import { BearerAuthGuard } from "src/infrastructure/guards/dubl-guards/bearer-auth.guard";
 import { CheckTokenAuthGuard } from "src/infrastructure/guards/dubl-guards/check-refresh-token.guard";
-import { RegisterUserCommand, RegisterUserUseCase } from "../application/use-cases/register-user";
+import { RegisterUserCommand } from "../application/use-cases/register-user";
 import { CommandBus } from "@nestjs/cqrs";
-import { CreateSessionUseCase } from "../application/use-cases/create-session";
+import { CreateSessionCommand } from "../application/use-cases/create-session";
 import { NewPasswordCommand } from "../application/use-cases/new-password";
+import { UpdateRefreshTokenCommand } from "../application/use-cases/update-refresh-token";
+import { PasswordRecoveryCommand } from "../application/use-cases/password-recovery";
+import { ResendEmailCommand } from "../application/use-cases/resend-email";
 
 @UseGuards(ThrottlerGuard)
 @Controller('auth')
@@ -25,9 +28,7 @@ export class AuthController{
         protected authRepository: AuthRepository,
         protected bcryptService: BcryptService,
         protected jwtService: JwtService,
-        private commandBus: CommandBus,
-        private createSessionUseCase: CreateSessionUseCase,
-        // protected registerUserUseCase: RegisterUserUseCase,
+        private commandBus: CommandBus
     ) {}
 
     @UseGuards(LocalAuthGuard)
@@ -38,12 +39,18 @@ export class AuthController{
         @Req() req: Request) {
             if(!req.user) throw new UnauthorizedException()
             const { accessToken, refreshToken } = this.jwtService.generateToken(req.user);
-            // await this.createSessionUseCase.execute() как правильно расписать?
-            await this.authService.createSession(
+
+            await this.commandBus.execute(new CreateSessionCommand(
                 req.user!.userId,
                 refreshToken,
                 req.headers["user-agent"] || "unknown",
-                req.ip || "unknown");
+                req.ip || "unknown"
+            ))
+            // await this.authService.createSession(
+            //     req.user!.userId,
+            //     refreshToken,
+            //     req.headers["user-agent"] || "unknown",
+            //     req.ip || "unknown");
 
         res.cookie('refreshToken', refreshToken, { httpOnly: true, secure: true });
         return { accessToken };
@@ -52,7 +59,8 @@ export class AuthController{
     @Post('password-recovery')
     @HttpCode(204)
     async authPasswordRecovery(@Body() body: RegistrationEmailResending) {
-        await this.authService.passwordRecovery(body.email);
+        // await this.authService.passwordRecovery(body.email);
+        await this.commandBus.execute(new PasswordRecoveryCommand(body.email));
     }
 
     @Post('new-password')
@@ -77,7 +85,8 @@ export class AuthController{
             if (!device) {
                 throw new UnauthorizedException();
             }
-            const result = await this.authService.updateRefreshToken(req.user, req.deviceId);
+            // const result = await this.authService.updateRefreshToken(req.user, req.deviceId);
+            const result = await this.commandBus.execute(new UpdateRefreshTokenCommand(req.user, req.deviceId));
 
             const { accessToken, refreshToken } = result;
             res.cookie('refreshToken', refreshToken, { httpOnly: true, secure: true })
@@ -109,7 +118,8 @@ export class AuthController{
     @Post('registration-email-resending')
     @HttpCode(204)
     async authRegistrationEmailResending(@Body() body: RegistrationEmailResending) {
-        const emailResending = await this.authService.resendEmail(body.email);
+        // const emailResending = await this.authService.resendEmail(body.email);
+        const emailResending = await this.commandBus.execute(new ResendEmailCommand(body.email));
         if(!emailResending) {
             throw new BadRequestException();
         }
