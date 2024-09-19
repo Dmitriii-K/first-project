@@ -13,9 +13,7 @@ export class CreatePostCommand {
 
 @CommandHandler(CreatePostCommand)
 export class CreatePostUseCase {
-    constructor(
-        private postRepository: PostRepository
-    ) {}
+    constructor(private postRepository: PostRepository) {}
 
     async execute(command: CreatePostCommand) {
         const {body, id} = command;

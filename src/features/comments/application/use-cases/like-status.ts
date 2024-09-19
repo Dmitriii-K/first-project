@@ -1,5 +1,4 @@
-import { Injectable } from "@nestjs/common";
-import { likeStatus, LikeStatusDto } from "src/features/likes/api/models/input.model";
+import { likeStatus } from "src/features/likes/api/models/input.model";
 import { Like } from "src/features/likes/domain/likes.entity";
 import { MeViewModel } from "src/features/auth/api/models/output.model";
 import { CommentRepository } from "../../repository/comment.repository";

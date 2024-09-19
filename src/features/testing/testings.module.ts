@@ -23,6 +23,7 @@ import { Like, LikesSchema } from "../likes/domain/likes.entity";
     ])],
     controllers: [TestingController],
     providers: [TestingService],
+    exports: []
 })
 export class TestingsModule {
 }

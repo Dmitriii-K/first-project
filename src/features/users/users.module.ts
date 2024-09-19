@@ -11,8 +11,8 @@ import { CommandBus } from "@nestjs/cqrs";
 @Module({
     imports: [MongooseModule.forFeature([{ name: User.name, schema: UserSchema }])],
     controllers: [UserController],
-    providers: [UserService, UserRepository, UserQueryRepository, BcryptService, CommandBus], // CommandBus ???
-    exports: [MongooseModule, UserService, UserRepository, UserQueryRepository, BcryptService]
+    providers: [UserService, UserRepository, UserQueryRepository, BcryptService, CommandBus],
+    exports: []
 })
 export class UsersModule {
 }
