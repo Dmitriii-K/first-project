@@ -1,5 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { UserRepository } from "../repository/user.repository";
+import { User } from "../domain/user.entity";
+import {WithId} from "mongodb"
 
 @Injectable()
 export class UserService /*implements IUserService*/{
@@ -18,5 +20,8 @@ export class UserService /*implements IUserService*/{
     // }
     async deleteUser(id: string) {
         return this.userRepository.deleteUser(id);
+    }
+    async validateUser(login: string, pass: string): Promise<WithId<User> | null> {
+        return this.userRepository.findOne(login);
     }
 }

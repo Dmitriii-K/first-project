@@ -1,20 +1,20 @@
 import { Strategy } from 'passport-local';
 import { PassportStrategy } from '@nestjs/passport';
 import { Injectable, UnauthorizedException } from '@nestjs/common';
-import { AuthService } from 'src/features/auth/application/auth.service';
 import { BcryptService } from '../adapters/bcrypt';
+import { UserService } from 'src/features/users/application/user.service';
 
 
 @Injectable()
 export class LocalStrategy extends PassportStrategy(Strategy) {
     constructor(
-        private authService: AuthService,
+        private userService: UserService,
         private bcryptService: BcryptService,
     ) {
     super({ usernameField: 'loginOrEmail',passwordField: "password" });
 }
     async validate(loginOrEmail: string, password: string) {
-    const user = await this.authService.validateUser(loginOrEmail, password);
+    const user = await this.userService.validateUser(loginOrEmail, password);
     if (!user) {
         throw new UnauthorizedException('User is not found');
     }

@@ -45,4 +45,36 @@ export class UserRepository /*implements IUserRepository*/{
         }
         return false;
     }
+
+    async updateCode(userId: string, newCode: string) {
+        const result = await this.userModel.updateOne({ _id: userId }, { $set: { 'emailConfirmation.confirmationCode': newCode } });
+        return result.modifiedCount === 1;
+    }
+    async updatePassword(userId: string, pass: string) {
+        const result = await this.userModel.updateOne({ _id: userId }, { $set: { password: pass } });
+        return result.modifiedCount === 1;
+    }
+    async checkUserByRegistration(login: string, email: string): Promise<UserDocument | null> {
+        return this.userModel.findOne({ $or: [{ login: login }, { email: email }] });
+    }
+    async findUserByLoginOrEmail(loginOrEmail: string): Promise<UserDocument | null> {
+        return this.userModel.findOne({ $or: [{ login: loginOrEmail }, { email: loginOrEmail }] });
+    }
+    async createUser(user: User) {
+        const saveResult = await this.userModel.create(user);
+        return saveResult._id.toString();
+    }
+    async findUserByCode(code: string): Promise<UserDocument | null> {
+        return this.userModel.findOne({ "emailConfirmation.confirmationCode": code });
+    }
+    async findUserByEmail(mail: string): Promise<UserDocument | null> {
+        return this.userModel.findOne({ email: mail });
+    }
+    async findOne(login: string): Promise<any | null> {
+        return this.userModel.findOne({ login: login });
+    }
+    async updateConfirmation(_id: string) {
+        const result = await this.userModel.updateOne({ _id }, { $set: { 'emailConfirmation.isConfirmed': true } });
+        return result.modifiedCount === 1;
+    }
 }

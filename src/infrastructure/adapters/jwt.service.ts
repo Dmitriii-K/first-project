@@ -22,7 +22,10 @@ export type UnionPayload = PayloadType & SystemPayload
 
 @Injectable()
 export class JwtService /*implements IJwtService*/ {
-    constructor(private configService: ConfigService) {}// Как подключить ?
+    private secretKey: string
+    constructor(private configService: ConfigService) {
+        this.secretKey = this.configService.get<string>('jwtSecretSettings.JWT_SECRET_KEY', {infer: true}) as Required<string>
+    }// Как подключить ?
     
 generateToken(user: RequestUserDTO, deviceId?: string): { accessToken: string, refreshToken: string } {
     const payload: PayloadType = {
@@ -37,17 +40,17 @@ generateToken(user: RequestUserDTO, deviceId?: string): { accessToken: string, r
     const optionsRefreshToken = {
         expiresIn: '20s'
     };
-    const secretKey = this.configService.get<number>('jwtSecretSettings.JWT_SECRET_KEY', {infer: true});
+    //const secretKey: string = this.configService.get<string>('jwtSecretSettings.JWT_SECRET_KEY', {infer: true}) as Required<string>;
     // console.log(secretKey)
-    const accessToken: string = jwt.sign(payload, secretKey, optionsAccessToken);
-    const refreshToken: string = jwt.sign(payload, secretKey, optionsRefreshToken);
+    const accessToken: string = jwt.sign(payload, this.secretKey, optionsAccessToken);
+    const refreshToken: string = jwt.sign(payload, this.secretKey, optionsRefreshToken);
     return { accessToken, refreshToken };
 }
 
 getUserIdByToken(token: string): UnionPayload | null {
     try {
-        const secretKey = this.configService.get<number>('jwtSecretSettings.JWT_SECRET_KEY', {infer: true});// почему number ???
-        return jwt.verify(token, secretKey) as unknown as UnionPayload;
+        //const secretKey = this.configService.get<string>('jwtSecretSettings.JWT_SECRET_KEY', {infer: true})  as Required<string>;// почему number ???
+        return jwt.verify(token, this.secretKey) as unknown as UnionPayload;
     } catch (error) {
         // console.log(error, " error")
         return null;
