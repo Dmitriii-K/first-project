@@ -1,32 +1,19 @@
 import { Injectable } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
-import { Post, PostDocument, PostModelType } from "../domain/post.entity";
-import { Comment, CommentDocument, CommentModelType } from "src/features/comments/domain/comment.entity";
+import { Post, PostModelType } from "../domain/post.entity";
 import { PostInputModel } from "../api/models/input.model";
-import { Blog, BlogModelType } from "src/features/blogs/domain/blog.entity";
 import {WithId} from "mongodb"
 
 @Injectable()
 export class PostRepository {
-    constructor(
-        @InjectModel(Post.name) private postModel: PostModelType,
-        @InjectModel(Blog.name) private blogModel: BlogModelType,
-        @InjectModel(Comment.name) private commentModel: CommentModelType,
-    ) {}
+    constructor(@InjectModel(Post.name) private postModel: PostModelType) {}
 
-    async findBlogNameForId(BlogId: string) {
-        return this.blogModel.findOne({ _id: BlogId });
-    }
     async findPostById(postId: string): Promise<WithId<Post> | null>{
         return this.postModel.findOne({ _id: postId });
     }
     async insertPost(data: Post) {
         const result = this.postModel.create(data);
         return (await result)._id.toString();
-    }
-    async insertComment(data: Comment) {
-        const result = this.commentModel.create(data);
-        return (await result).id;
     }
     async updatePost(post: PostInputModel, postId: string) {
         const result = this.postModel.updateOne({ _id: postId }, { $set: post });
@@ -41,5 +28,9 @@ export class PostRepository {
     async deletePost(postId: string) {
         const result = await this.postModel.deleteOne({ _id: postId });
         return result.deletedCount === 1;
+    }
+    async insertPostForBlog(data: Post) {
+        const result = this.postModel.create(data);
+        return (await result)._id.toString();
     }
 }

@@ -1,9 +1,9 @@
 import { BadRequestException } from "@nestjs/common";
-import { AuthRepository } from "../../repository/auth.repository";
 import { CommandHandler } from "@nestjs/cqrs";
 import { UserDocument } from "src/features/users/domain/user.entity";
 import { randomUUID } from "crypto";
 import { EmailService } from "src/infrastructure/adapters/sendEmail";
+import { UserRepository } from "src/features/users/repository/user.repository";
 
 export class ResendEmailCommand {
     constructor(public mail: string) {}
@@ -12,14 +12,14 @@ export class ResendEmailCommand {
 @CommandHandler(ResendEmailCommand)
 export class ResendEmailUseCase {
     constructor(
-        private authRepository: AuthRepository,
+        private userRepository: UserRepository,
         private emailService: EmailService
     ) {}
 
     async execute(commannd: ResendEmailCommand) {
         const {mail} = commannd;
         
-        const user: UserDocument | null = await this.authRepository.findUserByEmail(mail);
+        const user: UserDocument | null = await this.userRepository.findUserByEmail(mail);
         if (!user) {
             throw new BadRequestException({ errorsMessages: { message: "This email is incorrect", field: "email" } });
         }
@@ -27,7 +27,7 @@ export class ResendEmailUseCase {
             throw new BadRequestException({ errorsMessages: { message: "This field is verified", field: "email" } });
         }
         const newCode = randomUUID();
-        await this.authRepository.updateCode(user.id, newCode),
+        await this.userRepository.updateCode(user.id, newCode),
         this.emailService.sendMail(mail, newCode)
         return true;
     }

@@ -4,6 +4,7 @@ import { CommandHandler } from "@nestjs/cqrs";
 import { CommentInputModel } from "src/features/comments/api/models/input.model";
 import { NotFoundException } from "@nestjs/common";
 import { Comment } from "src/features/comments/domain/comment.entity";
+import { CommentRepository } from "src/features/comments/repository/comment.repository";
 
 export class CreateCommentByPostCommand {
     constructor(
@@ -15,7 +16,10 @@ export class CreateCommentByPostCommand {
 
 @CommandHandler(CreateCommentByPostCommand)
 export class CreateCommentByPostUseCase {
-    constructor(private postRepository: PostRepository) {}
+    constructor(
+        private postRepository: PostRepository,
+        private commentRepository: CommentRepository,
+    ) {}
 
     async execute(command: CreateCommentByPostCommand) {
         const {paramId, body, user} = command;
@@ -24,6 +28,6 @@ export class CreateCommentByPostUseCase {
             throw new NotFoundException()
         }
         const newComment: Comment = Comment.createComment(paramId, body.content, user.userId, user.login)
-        return this.postRepository.insertComment(newComment);
+        return this.commentRepository.insertComment(newComment);
     }
 }

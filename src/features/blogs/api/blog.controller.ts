@@ -9,6 +9,8 @@ import { BlogExistsPipe } from "src/infrastructure/pipes/blogExists.pipe";
 import { Request, Response } from "express";
 import { BasicAuthGuard } from "src/infrastructure/guards/basic.guard";
 import { SoftAuthGuard } from "src/infrastructure/guards/dubl-guards/soft-auth.guard";
+import { CommandBus } from "@nestjs/cqrs";
+import { CreatePostForBlogCommand } from "../application/use-cases/create-post-for-blog";
 
 
 @Controller('blogs')
@@ -16,7 +18,8 @@ export class BlogController {
     constructor(
         protected blogService: BlogService,
         protected blogQueryRepository: BlogQueryRepository,
-        protected blogRepository: BlogRepository
+        protected blogRepository: BlogRepository,
+        private commandBus: CommandBus
     ) {}
 
     @Get()
@@ -60,7 +63,8 @@ export class BlogController {
             if (!findBlog) {
                 throw new NotFoundException();
             }
-            const createResult = await this.blogService.createPostForBlog(id, body, findBlog.name);
+            // const createResult = await this.blogService.createPostForBlog(id, body, findBlog.name);
+            const createResult = await this.commandBus.execute(new CreatePostForBlogCommand(id, body, findBlog.name));
             const newPostForBlog = await this.blogQueryRepository.getPostForBlogById(createResult);
             return newPostForBlog;
     }

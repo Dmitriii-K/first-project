@@ -1,8 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { BlogRepository } from "../repository/blog.repository";
-import { BlogInputModel, BlogPostInputModel } from "../api/models/input.model";
-import { Blog, BlogDocument } from "../domain/blog.entity";
-import { Post, PostDocument } from "src/features/posts/domain/post.entity";
+import { BlogInputModel } from "../api/models/input.model";
+import { Blog } from "../domain/blog.entity";
 
 
 @Injectable()
@@ -13,10 +12,12 @@ export class BlogService {
         const newBlog: Blog = Blog.createBlog(data.name, data.description, data.websiteUrl);
         return this.blogRepository.insertBlog(newBlog);
     }
-    async createPostForBlog(blogId: string, data: BlogPostInputModel, name: string) {
-        const newPost: Post = Post.createPost(data.title, data.shortDescription, data.content, blogId, name);
-        return this.blogRepository.insertPostForBlog(newPost);
-    }
+
+    // async createPostForBlog(blogId: string, data: BlogPostInputModel, name: string) {
+    //     const newPost: Post = Post.createPost(data.title, data.shortDescription, data.content, blogId, name);
+    //     return this.blogRepository.insertPostForBlog(newPost);
+    // }
+
     async findBlogById(id: string) {
         const blog = await this.blogRepository.findBlogById(id);
         if (!blog) {

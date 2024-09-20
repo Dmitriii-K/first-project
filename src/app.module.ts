@@ -70,6 +70,9 @@ import { CreateCommentByPostUseCase } from './features/posts/application/use-cas
 import { CreatePostUseCase } from './features/posts/application/use-cases/create-post';
 import { NewPasswordUseCase } from './features/auth/application/use-cases/new-password';
 import { PasswordRecoveryUseCase } from './features/auth/application/use-cases/password-recovery';
+import { AuthLogoutAndDeleteSessionUseCase } from './features/auth/application/use-cases/auth-logout-and-delete-session';
+import { ConfirmEmailUseCase } from './features/auth/application/use-cases/confirm-email';
+import { CreatePostForBlogUseCase } from './features/blogs/application/use-cases/create-post-for-blog';
 
 const useCases = [
   CreateUserUseCase, 
@@ -82,7 +85,10 @@ const useCases = [
   CreateCommentByPostUseCase,
   CreatePostUseCase,
   NewPasswordUseCase,
-  PasswordRecoveryUseCase];
+  PasswordRecoveryUseCase,
+  AuthLogoutAndDeleteSessionUseCase,
+  ConfirmEmailUseCase,
+  CreatePostForBlogUseCase];
 const modules = [UsersModule, TestingsModule, AuthModule, SessionsModule];// импортировать! 
 
 @Module({

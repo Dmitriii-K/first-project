@@ -1,7 +1,7 @@
-import { AuthRepository } from "../../repository/auth.repository";
 import { CommandHandler } from "@nestjs/cqrs";
 import { JwtService } from "src/infrastructure/adapters/jwt.service";
 import { Session } from "src/features/sessions/domain/session.entity";
+import { SessionRepository } from "src/features/sessions/repository/session.repository";
 
 export class CreateSessionCommand {
     constructor(
@@ -15,8 +15,8 @@ export class CreateSessionCommand {
 @CommandHandler(CreateSessionCommand)
 export class CreateSessionUseCase {
     constructor(
-        private authRepository: AuthRepository,
-        private jwtService: JwtService
+        private jwtService: JwtService,
+        private sessionRepository: SessionRepository
     ) {}
 
     async execute(command: CreateSessionCommand) {
@@ -28,6 +28,6 @@ export class CreateSessionUseCase {
         exp = new Date(exp * 1000).toISOString();// вынести в createSession
 
         const newSession: Session = Session.createSession(userId, deviceId, iat, exp, userAgent, ip);
-        await this.authRepository.createSession(newSession);
+        await this.sessionRepository.createSession(newSession);
     }
 }

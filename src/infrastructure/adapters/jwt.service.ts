@@ -54,3 +54,17 @@ getUserIdByToken(token: string): UnionPayload | null {
     }
 }
 }
+
+// @Injectable()
+// export class JwtAdapter {
+//   private readonly logger = new Logger(JwtAdapter.name);
+//   private readonly jwtConfiguration: ConfigurationType['jwtSetting'];
+
+//   constructor(
+//     private readonly jwtService: JwtService,
+//     private readonly configService: ConfigService<ConfigurationType, true>,
+//   ) {
+//     this.jwtConfiguration = this.configService.get<ConfigurationType['jwtSetting']>('jwtSetting', {
+//       infer: true,
+//     }) as ConfigurationType['jwtSetting'];
+//   }

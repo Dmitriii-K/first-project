@@ -1,7 +1,4 @@
 import { BadRequestException, Body, Controller, Get, HttpCode, Post, Req, Res, UnauthorizedException, UseGuards } from "@nestjs/common";
-import { AuthService } from "../application/auth.service";
-import { AuthRepository } from "../repository/auth.repository";
-import { BcryptService } from "src/infrastructure/adapters/bcrypt";
 import { JwtService } from "src/infrastructure/adapters/jwt.service";
 import { NewPasswordRecoveryInputModel, RegistrationConfirmationCodeModel, RegistrationEmailResending } from "./models/input.model";
 import { UserInputModel } from "src/features/users/api/models/input.models";
@@ -19,14 +16,15 @@ import { NewPasswordCommand } from "../application/use-cases/new-password";
 import { UpdateRefreshTokenCommand } from "../application/use-cases/update-refresh-token";
 import { PasswordRecoveryCommand } from "../application/use-cases/password-recovery";
 import { ResendEmailCommand } from "../application/use-cases/resend-email";
+import { SessionRepository } from "src/features/sessions/repository/session.repository";
+import { ConfirmEmailCommand } from "../application/use-cases/confirm-email";
+import { AuthLogoutAndDeleteSessionCommand } from "../application/use-cases/auth-logout-and-delete-session";
 
 @UseGuards(ThrottlerGuard)
 @Controller('auth')
 export class AuthController{
     constructor(
-        protected authService: AuthService,
-        protected authRepository: AuthRepository,
-        protected bcryptService: BcryptService,
+        protected sessionRepository: SessionRepository,
         protected jwtService: JwtService,
         private commandBus: CommandBus
     ) {}
@@ -38,7 +36,7 @@ export class AuthController{
         @Res({ passthrough: true }) res: Response,
         @Req() req: Request) {
             if(!req.user) throw new UnauthorizedException()
-            const { accessToken, refreshToken } = this.jwtService.generateToken(req.user);
+            const { accessToken, refreshToken } = this.jwtService.generateToken(req.user); // ???
 
             await this.commandBus.execute(new CreateSessionCommand(
                 req.user!.userId,
@@ -81,7 +79,7 @@ export class AuthController{
         @Req() req: Request) {
             if(!req.user) throw new UnauthorizedException()
             if(!req.deviceId) throw new UnauthorizedException()
-            const device = await this.authRepository.findSessionFromDeviceId(req.deviceId);
+            const device = await this.sessionRepository.findSessionFromDeviceId(req.deviceId); // ???
             if (!device) {
                 throw new UnauthorizedException();
             }
@@ -108,7 +106,8 @@ export class AuthController{
     @Post('registration-confirmation')
     @HttpCode(204)
     async authRegistrationConfirmation(@Body() body: RegistrationConfirmationCodeModel) {
-        const result = await this.authService.confirmEmail(body.code);
+        // const result = await this.authService.confirmEmail(body.code);
+        const result = await this.commandBus.execute(new ConfirmEmailCommand(body.code));
         if(!result) {
             throw new BadRequestException();
         }
@@ -133,11 +132,12 @@ export class AuthController{
         @Res() res: Response,
         @Req() req: Request) {
             if(!req.deviceId) throw new UnauthorizedException();
-            const device = await this.authRepository.findSessionFromDeviceId(req.deviceId);
+            const device = await this.sessionRepository.findSessionFromDeviceId(req.deviceId); // ???
             if (!device) {
                 throw new UnauthorizedException();
             }
-            const result = await this.authService.authLogoutAndDeleteSession(req.deviceId);
+            // const result = await this.authService.authLogoutAndDeleteSession(req.deviceId);
+            const result = await this.commandBus.execute(new AuthLogoutAndDeleteSessionCommand(req.deviceId));
             if (result) {
                 res.clearCookie('refreshToken');
                 res.sendStatus(204);

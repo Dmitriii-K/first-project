@@ -1,8 +1,7 @@
-import { Injectable } from "@nestjs/common";
-import { AuthRepository } from "../../repository/auth.repository";
 import { CommandHandler } from "@nestjs/cqrs";
 import { JwtService } from "src/infrastructure/adapters/jwt.service";
 import { MeViewModel } from "../../api/models/output.model";
+import { SessionRepository } from "src/features/sessions/repository/session.repository";
 
 export class UpdateRefreshTokenCommand {
     constructor(
@@ -14,7 +13,7 @@ export class UpdateRefreshTokenCommand {
 @CommandHandler(UpdateRefreshTokenCommand)
 export class UpdateRefreshTokenUseCase {
     constructor(
-        private authRepository: AuthRepository,
+        private sessionRepository: SessionRepository,
         private jwtService: JwtService
     ) {}
 
@@ -27,7 +26,7 @@ export class UpdateRefreshTokenUseCase {
         if (!payload) throw new Error('пейлода нет, хотя он должен быть после создания новой пары');
         let { iat } = payload;
         iat = new Date(iat * 1000).toISOString();
-        await this.authRepository.updateIat(iat, deviceId);
+        await this.sessionRepository.updateIat(iat, deviceId);
         return { accessToken, refreshToken };
     }
 }

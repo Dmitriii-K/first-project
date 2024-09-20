@@ -1,20 +1,17 @@
-import { BadRequestException, Injectable } from "@nestjs/common";
-import { AuthRepository } from "../repository/auth.repository";
-import { User, UserDocument } from "src/features/users/domain/user.entity";
-import {WithId} from "mongodb"
+import { Injectable } from "@nestjs/common";
 
 @Injectable()
 export class AuthService{
-    constructor(private authRepository: AuthRepository) {}
+    constructor() {}
 
-    async checkCredentials(loginOrEmail: string) {
-        const user = await this.authRepository.findUserByLoginOrEmail(loginOrEmail);
-        if (user) {
-            return user;
-        } else {
-            return null;
-        }
-    }
+    // async checkCredentials(loginOrEmail: string) {
+    //     const user = await this.userRepository.findUserByLoginOrEmail(loginOrEmail);
+    //     if (user) {
+    //         return user;
+    //     } else {
+    //         return null;
+    //     }
+    // }
 
     // async registerUser(data: UserInputModel) {
     //     const checkUser = await this.authRepository.checkUserByRegistration(data.login, data.email);
@@ -46,14 +43,14 @@ export class AuthService{
     //     await this.authRepository.createSession(newSession);
     // }
 
-    async authLogoutAndDeleteSession(deviceId: string) {
-        const deletedSession = await this.authRepository.deleteSession(deviceId);
-        if (deletedSession) {
-            return true;
-        } else {
-            return false;
-        }
-    }
+    // async authLogoutAndDeleteSession(deviceId: string) {
+    //     const deletedSession = await this.sessionRepository.deleteSession(deviceId);
+    //     if (deletedSession) {
+    //         return true;
+    //     } else {
+    //         return false;
+    //     }
+    // }
 
     // async newPassword(data: NewPasswordRecoveryInputModel): Promise<boolean> {
     //     // Проверяем, существует ли пользователь с таким кодом восстановления
@@ -84,23 +81,23 @@ export class AuthService{
     //     return true;
     // }
 
-    async confirmEmail(code: string) {
-        const user: UserDocument | null = await this.authRepository.findUserByCode(code);
-        if (!user) {
-            throw new BadRequestException({ errorsMessages: { message: "This code is incorrect", field: "code" } });
-        }
-        if (user.emailConfirmation.isConfirmed) {
-            throw new BadRequestException({ errorsMessages: { message: "This field is verified", field: "code" } });
-        }
-        if (user.emailConfirmation.confirmationCode !== code) {
-            throw new BadRequestException({ errorsMessages: { message: "This code is incorrect", field: "code" } });
-        }
-        if (user.emailConfirmation.expirationDate < new Date().toISOString()) {
-            throw new BadRequestException({ errorsMessages: { message: "Expiration date is over", field: "code" } });
-        }
-        const result = await this.authRepository.updateConfirmation(user.id);
-        return result;
-    }
+    // async confirmEmail(code: string) {
+    //     const user: UserDocument | null = await this.userRepository.findUserByCode(code);
+    //     if (!user) {
+    //         throw new BadRequestException({ errorsMessages: { message: "This code is incorrect", field: "code" } });
+    //     }
+    //     if (user.emailConfirmation.isConfirmed) {
+    //         throw new BadRequestException({ errorsMessages: { message: "This field is verified", field: "code" } });
+    //     }
+    //     if (user.emailConfirmation.confirmationCode !== code) {
+    //         throw new BadRequestException({ errorsMessages: { message: "This code is incorrect", field: "code" } });
+    //     }
+    //     if (user.emailConfirmation.expirationDate < new Date().toISOString()) {
+    //         throw new BadRequestException({ errorsMessages: { message: "Expiration date is over", field: "code" } });
+    //     }
+    //     const result = await this.userRepository.updateConfirmation(user.id);
+    //     return result;
+    // }
 
     // async resendEmail(mail: string) {
     //     const user: UserDocument | null = await this.authRepository.findUserByEmail(mail);
@@ -115,8 +112,4 @@ export class AuthService{
     //     this.emailService.sendMail(mail, newCode)
     //     return true;
     // }
-
-    async validateUser(login: string, pass: string): Promise<WithId<User> | null> {
-        return this.authRepository.findOne(login);
-    }
 }

@@ -3,13 +3,12 @@ import { InjectModel } from "@nestjs/mongoose";
 import { ICommentRepository } from "../api/models/interface";
 import { Comment, CommentModelType } from "../domain/comment.entity";
 import { LikeModelType, Like } from "src/features/likes/domain/likes.entity";
-import { LikesType } from "src/features/likes/api/models/input.model";
 
 @Injectable()
 export class CommentRepository /*implements ICommentRepository*/{
     constructor(
         @InjectModel(Comment.name) private commentModel: CommentModelType,
-        @InjectModel(Like.name) private likesModel: LikeModelType,
+        @InjectModel(Like.name) private likesModel: LikeModelType
     ) {}
 
     async updateComment(commentId: string, content: string) {
@@ -43,5 +42,9 @@ export class CommentRepository /*implements ICommentRepository*/{
     async deleteComment(commentId: string) {
         const comment = await this.commentModel.deleteOne({ _id: commentId });
         return comment.deletedCount === 1;
+    }
+    async insertComment(data: Comment) {
+        const result = this.commentModel.create(data);
+        return (await result).id;
     }
 }

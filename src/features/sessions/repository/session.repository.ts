@@ -27,4 +27,23 @@ export class SessionRepository /*implements ICommentRepository*/{
         const session = await this.sessionModel.findOne({ device_id: deviceId });
         return session || null
     }
+
+    async createSession(session: Session) {
+        const saveResult = await this.sessionModel.create(session);
+        return saveResult._id.toString();
+    }
+    async findSessionFromDeviceId(deviceId: string) {
+        return this.sessionModel.findOne({ device_id: deviceId });
+    }
+    async updateIat(iat: string, deviceId: string) {
+        await this.sessionModel.updateOne({ device_id: deviceId }, { $set: { iat: iat } });
+    }
+    async deleteSession(deviceId: string) {
+        const result = await this.sessionModel.deleteOne({ device_id: deviceId });
+        if (result.deletedCount === 1) {
+            return true;
+        } else {
+            return false;
+        }
+    }
 }
