@@ -1,5 +1,4 @@
-import {CanActivate, ExecutionContext, HttpException, Injectable, UnauthorizedException} from '@nestjs/common';
-import { Observable } from 'rxjs';
+import {CanActivate, ExecutionContext, Injectable, UnauthorizedException} from '@nestjs/common';
 import {Request} from "express";
 import { UserRepository } from 'src/features/users/repository/user.repository';
 import { JwtService } from '../../adapters/jwt.service';
