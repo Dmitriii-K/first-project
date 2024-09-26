@@ -60,7 +60,6 @@ import { LikeStatusUseCase } from './features/comments/application/use-cases/lik
 import { RegisterUserUseCase } from './features/auth/application/use-cases/register-user';
 import { CqrsModule } from '@nestjs/cqrs';
 import { UsersModule } from './features/users/users.module';
-import { TestingsModule } from './features/testing/testings.module';
 import { SessionsModule } from './features/sessions/sessions.module';
 import { AuthModule } from './features/auth/auth.module';
 import { CreateSessionUseCase } from './features/auth/application/use-cases/create-session';
@@ -89,11 +88,11 @@ const useCases = [
   AuthLogoutAndDeleteSessionUseCase,
   ConfirmEmailUseCase,
   CreatePostForBlogUseCase];
-const modules = [UsersModule, TestingsModule, AuthModule, SessionsModule];// импортировать! 
+const modules = [UsersModule, AuthModule, SessionsModule/*, CoreModule*/];// импортировать! 
 
 @Module({
   imports: [
-    CqrsModule,
+    CqrsModule,//-
     ConfigModule.forRoot({
       isGlobal: true,
       load: [configuration],
@@ -137,7 +136,7 @@ const modules = [UsersModule, TestingsModule, AuthModule, SessionsModule];// и�
     ThrottlerModule.forRoot([{
       ttl: 10000,
       limit: 5,
-    }]),
+    }]),//-
     PassportModule,
     // ...modules
   ],
@@ -158,10 +157,10 @@ const modules = [UsersModule, TestingsModule, AuthModule, SessionsModule];// и�
     // },
     AppService,
     TestingService,//-
-    LocalStrategy, JwtStrategy, BasicStrategy, SoftAuthGuard, CheckTokenAuthGuard,
+    LocalStrategy, JwtStrategy, BasicStrategy, SoftAuthGuard, CheckTokenAuthGuard,//-
     LoginIsExistConstraint, EmailIsExistConstraint, BlogIsExistConstraint,
     UserService, UserQueryRepository, UserRepository,//-
-    BcryptService, EmailService, JwtService,
+    BcryptService, EmailService, JwtService,//-
     CommentService, CommentQueryRepository, CommentRepository,
     BlogService, BlogRepository, BlogQueryRepository,
     PostService, PostRepository, PostQueryRepository,

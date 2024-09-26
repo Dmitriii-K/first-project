@@ -10,6 +10,6 @@ import { Session, SessionSchema } from "./domain/session.entity";
     imports: [MongooseModule.forFeature([{ name: Session.name, schema: SessionSchema }])],
     controllers: [SessionController],
     providers: [SessionsService, SessionRepository, SessionsQueryRepository],
-    exports: []
+    exports: [SessionRepository]
 })
 export class SessionsModule {}
