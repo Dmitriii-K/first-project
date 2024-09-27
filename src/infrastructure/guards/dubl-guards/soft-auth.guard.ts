@@ -8,7 +8,7 @@ import { JwtService } from 'src/infrastructure/adapters/jwt.service';
 export class SoftAuthGuard implements CanActivate {
     constructor(
         protected userRepository: UserRepository,
-        protected jwtService: JwtService,) {}
+        protected jwtService: JwtService) {}
 
     async canActivate(
     context: ExecutionContext,

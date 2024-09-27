@@ -1,12 +1,12 @@
 import { Injectable } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
-import { Post, PostModelType } from "../../posts/domain/post.entity";
-import { Blog, BlogModelType } from "../../blogs/domain/blog.entity";
-import { Comment, CommentModelType } from "../../comments/domain/comment.entity";
+import { Post, PostModelType } from "../../bloggers_platform/posts/domain/post.entity";
+import { Blog, BlogModelType } from "../../bloggers_platform/blogs/domain/blog.entity";
+import { Comment, CommentModelType } from "../../bloggers_platform/comments/domain/comment.entity";
 import { User, UserModelType } from "../../users/domain/user.entity";
 import { ApiInfo, ApiInfoModelType } from "../../auth/domain/auth.entity";
 import { Session, SessionModelType } from "../../sessions/domain/session.entity";
-import { Like, LikeModelType } from "../../likes/domain/likes.entity";
+import { Like, LikeModelType } from "../../bloggers_platform/likes/domain/likes.entity";
 
 @Injectable()
 export class TestingService {

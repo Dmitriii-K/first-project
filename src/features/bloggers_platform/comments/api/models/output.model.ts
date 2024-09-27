@@ -20,10 +20,3 @@ export class PaginatorCommentViewModelDB {
     totalCount:	number;
     items: CommentViewModel[];
 }
-
-export class DeviceViewModel {
-    ip: string;
-    title: string;
-    lastActiveDate: string;
-    deviceId: string
-}
