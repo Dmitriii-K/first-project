@@ -1,4 +1,4 @@
-import { LikesCount } from "src/features/likes/api/models/input.model";
+import { LikesCount } from "src/features/bloggers_platform/likes/api/models/input.model";
 
 export class CommentatorInfo {
     userId:	string;

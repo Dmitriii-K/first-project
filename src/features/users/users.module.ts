@@ -3,16 +3,17 @@ import { UserController } from "./api/users.controller";
 import { UserService } from "./application/user.service";
 import { UserRepository } from "./repository/user.repository";
 import { UserQueryRepository } from "./repository/user.query-repository";
-import { BcryptService } from "src/infrastructure/adapters/bcrypt";
 import { MongooseModule } from "@nestjs/mongoose";
 import { User, UserSchema } from "./domain/user.entity";
 import { CqrsModule } from "@nestjs/cqrs";
+import { AdaptersModule } from "src/infrastructure/adapters/adapters.module";
 
 @Module({
-    imports: [CqrsModule,
+    imports: [CqrsModule, 
+        // AdaptersModule,
         MongooseModule.forFeature([{ name: User.name, schema: UserSchema }])],
     controllers: [UserController],
-    providers: [UserService, UserRepository, UserQueryRepository, BcryptService],
+    providers: [UserService, UserRepository, UserQueryRepository],
     exports: [UserRepository, UserService]
 })
 export class UsersModule {

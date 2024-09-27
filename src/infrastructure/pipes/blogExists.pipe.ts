@@ -1,7 +1,7 @@
 import { PipeTransform, Injectable, ArgumentMetadata, BadRequestException, NotFoundException } from '@nestjs/common';
 import { validate } from 'class-validator';
 import { plainToInstance } from 'class-transformer';
-import { BlogRepository } from 'src/features/blogs/repository/blog.repository';
+import { BlogRepository } from 'src/features/bloggers_platform/blogs/repository/blog.repository';
 
 @Injectable()
 export class BlogExistsPipe implements PipeTransform {
