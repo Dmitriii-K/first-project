@@ -33,21 +33,6 @@ import { CoreModule } from './infrastructure/core.module';
 import { TestingsModule } from './features/testing/testings.module';
 import { BloggersPlatformModule } from './features/bloggers_platform/bloggersPlatform.module';
 
-const useCases = [
-  CreateUserUseCase, 
-  LikeStatusUseCase, 
-  UpdatePostLikeUseCase,
-  RegisterUserUseCase, 
-  CreateSessionUseCase, 
-  ResendEmailUseCase, 
-  UpdateRefreshTokenUseCase,
-  CreateCommentByPostUseCase,
-  CreatePostUseCase,
-  NewPasswordUseCase,
-  PasswordRecoveryUseCase,
-  AuthLogoutAndDeleteSessionUseCase,
-  ConfirmEmailUseCase,
-  CreatePostForBlogUseCase];
 const modules = [TestingsModule, UsersModule, AdaptersModule, AuthModule, SessionsModule, CoreModule, BloggersPlatformModule];
 
 @Module({
@@ -100,6 +85,7 @@ const modules = [TestingsModule, UsersModule, AdaptersModule, AuthModule, Sessio
     // },
     AppService,
     LoginIsExistConstraint, EmailIsExistConstraint, BlogIsExistConstraint,
-    ...useCases],
+    // ...useCases
+  ],
 })
 export class AppModule {}
