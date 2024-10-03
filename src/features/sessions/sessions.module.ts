@@ -9,7 +9,7 @@ import { UsersModule } from "../users/users.module";
 
 @Module({
     imports: [
-        UsersModule,// почему???
+        UsersModule,
         MongooseModule.forFeature([{ name: Session.name, schema: SessionSchema }])
     ],
     controllers: [SessionController],

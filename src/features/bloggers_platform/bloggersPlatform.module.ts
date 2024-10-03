@@ -19,12 +19,17 @@ import { Blog, BlogSchema } from "./blogs/domain/blog.entity";
 import { Comment, CommentSchema } from "./comments/domain/comment.entity";
 import { CoreModule } from "src/infrastructure/core.module";
 import { UsersModule } from "../users/users.module";
+import { LikeStatusUseCase } from "./comments/application/use-cases/like-status";
+import { UpdatePostLikeUseCase } from "./posts/application/use-cases/update-post-like";
+import { CreateCommentByPostUseCase } from "./posts/application/use-cases/create-comment-by-post";
+import { CreatePostUseCase } from "./posts/application/use-cases/create-post";
+import { CreatePostForBlogUseCase } from "./blogs/application/use-cases/create-post-for-blog";
 
 @Module({
     imports: [
         CqrsModule,
         UsersModule,
-        // CoreModule,
+        CoreModule,
         MongooseModule.forFeature([
             { name: Comment.name, schema: CommentSchema },
             { name: Blog.name, schema: BlogSchema },
@@ -33,7 +38,13 @@ import { UsersModule } from "../users/users.module";
         ]),
     ],
     controllers: [BlogController, CommentController, PostController],
-    providers: [BlogService, BlogRepository, BlogQueryRepository, CommentService, CommentRepository, CommentQueryRepository, PostService, PostRepository, PostQueryRepository],
+    providers: [
+        BlogService, BlogRepository, BlogQueryRepository, 
+        CommentService, CommentRepository, CommentQueryRepository, 
+        PostService, PostRepository, PostQueryRepository,
+        LikeStatusUseCase, UpdatePostLikeUseCase, CreateCommentByPostUseCase, 
+        CreatePostUseCase, CreatePostForBlogUseCase
+    ],
     exports: [BlogRepository, PostRepository, CommentRepository, BlogRepository]
 })
 export class BloggersPlatformModule {

@@ -7,13 +7,14 @@ import { MongooseModule } from "@nestjs/mongoose";
 import { User, UserSchema } from "./domain/user.entity";
 import { CqrsModule } from "@nestjs/cqrs";
 import { AdaptersModule } from "src/infrastructure/adapters/adapters.module";
+import { CreateUserUseCase } from "./application/use-cases/create-user";
 
 @Module({
     imports: [CqrsModule, 
-        // AdaptersModule,
+        AdaptersModule,
         MongooseModule.forFeature([{ name: User.name, schema: UserSchema }])],
     controllers: [UserController],
-    providers: [UserService, UserRepository, UserQueryRepository],
+    providers: [UserService, UserRepository, UserQueryRepository, CreateUserUseCase],
     exports: [UserRepository, UserService]
 })
 export class UsersModule {

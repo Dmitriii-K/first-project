@@ -13,7 +13,7 @@ import { AdaptersModule } from "./adapters/adapters.module";
     imports: [
         SessionsModule,
         UsersModule,
-        // AdaptersModule
+        AdaptersModule
     ],
     controllers: [],
     providers: [LocalStrategy, JwtStrategy, BasicStrategy, SoftAuthGuard, CheckTokenAuthGuard],
